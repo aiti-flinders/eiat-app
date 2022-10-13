@@ -1,0 +1,13 @@
+name: eiat-app
+title: eiat-app
+username:
+account: aiti
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7283243
+bundleId: 6394238
+url: https://aiti.shinyapps.io/eiat-app/
+when: 1665552735.55496
+lastSyncTime: 1665552735.55496
+asMultiple: FALSE
+asStatic: FALSE

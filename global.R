@@ -1,0 +1,10 @@
+library(eiat)
+library(DT)
+library(dplyr)
+library(tidyr)
+library(shinyMatrix)
+library(ggplot2)
+library(aititheme)
+library(glue)
+
+regions <- eiat:::get_available_regions(2016)
