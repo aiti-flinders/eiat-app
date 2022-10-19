@@ -2,11 +2,83 @@ function(input, output, session) {
 
   options(DT.options = list(pageLength = 19, dom = "t"))
 
+
+# File Upload -------------------------------------------------------------
+
+  user_matrix <- reactive({
+    req(input$upload)
+
+    ext <- tools::file_ext(input$upload$name)
+
+    uploaded_file <- vroom::vroom(input$upload$datapath,
+                                  delim = ",")
+
+    uploaded_data <- uploaded_file %>%
+      select(where(is.double)) %>%
+      mutate(across(where(is.double), ~ifelse(is.na(.x), 0, .x)))
+
+    m <- matrix(sapply(uploaded_data, cbind, simplify = TRUE),
+                nrow = 19,
+                ncol = input$years,
+                dimnames = list(eiat:::anzsic_swap$name,
+                                2022:(2022 + input$years - 1)))
+
+    m
+
+
+  })
+
+
+# File Download (Template) ------------------------------------------------
+
+output$download <- downloadHandler(
+  filename = function() {
+    "EIAT-Template.csv"
+  },
+  content = function(file) {
+    out <- matrix(0, nrow = 19, ncol = input$years, dimnames = list(eiat:::anzsic_swap$name, 2022:(2022 + input$years - 1)))
+    out <- as_tibble(out, rownames = "Sector")
+    vroom::vroom_write(out, file, delim = ",")
+  }
+)
+
+
+# Matrix ------------------------------------------------------------------
+
+  output$m <- renderUI({
+    col_names <- 2022:(2022 + input$years - 1)
+    matrixInput("industry_input",
+                class = "numeric",
+                cols = list(
+                  extend = FALSE
+                ),
+                rows = list(
+                  names = TRUE
+                ),
+                value = matrix(0, nrow = 19, ncol = input$years, dimnames = list(eiat:::anzsic_swap$name, col_names))
+    )
+  })
+
   observeEvent(input$random, {
 
-    m <- matrix(round(runif(19*10, min = 0, max = 100), 2), nrow = 19, ncol = 10, dimnames = list(LETTERS[1:19], 2022:2031))
+    col_names <- 2022:(2022 + input$years - 1)
+
+    m <- matrix(round(runif(19*10, min = 0, max = 100), 2), nrow = 19, ncol = input$years, dimnames = list(eiat:::anzsic_swap$name, col_names))
 
     updateMatrixInput(session, "industry_input", m)
+  })
+
+  observeEvent(input$clear, {
+
+    col_names <- 2022:(2022 + input$years - 1)
+
+    m <- matrix(0, nrow = 19, ncol = input$years, dimnames = list(eiat:::anzsic_swap$name, col_names))
+    updateMatrixInput(session, "industry_input", m)
+
+  })
+
+  observeEvent(input$upload, {
+    updateMatrixInput(session, "industry_input", user_matrix())
   })
 
   region_selected <- reactive(input$lga)
@@ -28,7 +100,7 @@ function(input, output, session) {
 
 
 
-# Employment --------------------------------------------------------------
+  # Employment --------------------------------------------------------------
 
 
   output$employment <- DT::renderDataTable({
@@ -73,7 +145,7 @@ function(input, output, session) {
   })
 
 
-# GRP ---------------------------------------------------------------------
+  # GRP ---------------------------------------------------------------------
 
 
 
@@ -103,8 +175,8 @@ function(input, output, session) {
 
   output$grp_table_sector <- renderTable({
     d <- impact_analysis(region = input$lga,
-                    years = 2022:2031,
-                    impacts = input$industry_input) %>%
+                         years = 2022:2031,
+                         impacts = input$industry_input) %>%
       .[["grp"]] %>%
       pivot_wider(names_from = year) %>%
       group_by(Sector) %>%
@@ -143,9 +215,9 @@ function(input, output, session) {
   })
 
 
-# Output ------------------------------------------------------------------
+  # Output ------------------------------------------------------------------
 
-  output$output<- DT::renderDataTable({
+  output$output <- DT::renderDataTable({
     impact_analysis(region = input$lga,
                     years = 2022:2031,
                     impacts = input$industry_input) %>%
@@ -186,7 +258,7 @@ function(input, output, session) {
            title = glue("Output ($M) by Industry in {input$lga}"))
   })
 
-# Inputs ------------------------------------------------------------------
+  # Inputs ------------------------------------------------------------------
 
 
   output$input_plot <- renderPlot({
@@ -240,7 +312,7 @@ function(input, output, session) {
     h3(glue("Direct Capital Expenditure ($M) by Industry in {input$lga}"))
   })
 
-# Titles ------------------------------------------------------------------
+  # Titles ------------------------------------------------------------------
 
 
   titleServer("input_table_title", text = "Direct Capital Expenditure ($M)", region_selected)
@@ -272,7 +344,7 @@ function(input, output, session) {
   #
 
 
-# Base Data ---------------------------------------------------------------
+  # Base Data ---------------------------------------------------------------
 
 
   output$national_io <- renderTable(
