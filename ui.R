@@ -15,16 +15,31 @@ navbarPage("Economic Impact Assessment Tool",
                       urban design and transport systems, infrasftructure demand, and regional taxes, amongst others."),
                            h3("Using the Economic Impact Analysis Tool"),
                            tags$b("The quality of an economic impact assessment is dependent on the quality of input data.", style = 'color:red'),
-                           br(),
                            p("The analyst is required to enter the direct capital expenditures assosciated with the investment project of interest.
                              These expenditures must be expressed in millions of dollars ($M) in basic or producer prices which exclude margins,
                              taxes, and subsidies. Only expenditure which is expected to occur inside the region should be entered. Expenditures that
                              occur outside of the region should be excluded from the analysis. This includes expenditure which may be allocated to a region but
                              must be imported from outside the region. The tool is agnostic to input data. Any reporting of potential economic impacts
                              should also include a summary of the data used to generate the impact."),
-                           br(),
                            p("For simple projects, the user may enter data directly into the Data Input panel in Project Setup. For more complex analyses,
-                             the user may download an excel template, enter the expenditure, and upload to the tool.")
+                             the user may download an excel template, enter the expenditure, and upload to the tool."),
+                           h3("Important Assumptions"),
+                           p("The use of an input-output model imposes a number of assumptions which must be considered in interpreting the predicted impacts.
+                             They include:",
+                             tags$ol(
+                               tags$li("Increases in demand in the region are serviced by industries with constant proportions, and no significant price adjustments occur."),
+                               tags$li("Industries have a linear production function, which implies constant returns to scales and fixed input proportions."),
+                               tags$li("Firms within a sector are homogenous, which implies they produce a fixed set of products that are not produced by any other sector,
+                                       and that the input structure of the firms are the same."),
+                               tags$li("The model is a static model that does not take into account the dynamic processes involved in the adjustment to an external change.")
+                               )
+                           ),
+                           h3("Required Information"),
+                           p("Before using input-output analysis to estimate the economic impact of regional expenditure, the user is required to collect information.
+                             The analyst must know the magnitude of various expenditures and where they occur. Also needed is information on how the sectors recieving this
+                             expenditure share their expenditures among the various sectors from whom they buy, and so on, for the further expenditure rounds. While private
+                             and public stakeholders are welcome to use this powerful tool to conduct input-output analysis, it is recommended that expert consultants are
+                             engaged for a full and detailed report on the estimations of economic impacts and the interpretations.")
 
                     ),
                     column(width = 5, id = "blue",
@@ -68,7 +83,7 @@ navbarPage("Economic Impact Assessment Tool",
                                  numericInput("inflation", "Inflation multiplier (NYI)", value = 1, max = 2, step = 0.01)
                                ),
                                h3("BYO Data"),
-                               numericInput("years", "Number of years: ", value = 1, max = 10, step = 1),
+                               numericInput("years", "Number of years: ", value = 1, min = 1,  max = 10, step = 1),
                                splitLayout(
                                  downloadButton("download", "Download Excel Template", style = 'margin-top:25px'),
                                  fileInput("upload", "Upload Data")
@@ -77,7 +92,24 @@ navbarPage("Economic Impact Assessment Tool",
 
                       ),
                       tabPanel("Data Input",
-                               uiOutput("m"),
+                               matrixInput("industry_input",
+                                           class = "numeric",
+                                           cols = list(
+                                             names = TRUE,
+                                             extend = TRUE,
+                                             editableNames = FALSE,
+                                             delta = 0,
+                                             delete = TRUE
+                                             ),
+                                           rows = list(
+                                             names = TRUE,
+                                             extend = TRUE,
+                                             editableNames = FALSE,
+                                             delta = 0,
+                                             delete = FALSE
+                                             ),
+                                           value = matrix(0, nrow = 19, ncol = 1, dimnames = list(eiat:::anzsic_swap$name, 2022))
+                               ),
                                actionButton("random", "Generate Random Data"),
                                actionButton("clear", "Clear ALL Entered Data")
                       ),
@@ -88,6 +120,7 @@ navbarPage("Economic Impact Assessment Tool",
                                tableOutput("input_table"),
                                titleUI("input_table_sector_title"),
                                tableOutput("input_table_sector")
+
                       )
                     )
 
