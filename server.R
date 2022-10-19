@@ -17,11 +17,13 @@ function(input, output, session) {
       select(where(is.double)) %>%
       mutate(across(where(is.double), ~ifelse(is.na(.x), 0, .x)))
 
+    n_col <- ncol(uploaded_data)
+
     m <- matrix(sapply(uploaded_data, cbind, simplify = TRUE),
                 nrow = 19,
-                ncol = input$years,
+                ncol = n_col,
                 dimnames = list(eiat:::anzsic_swap$name,
-                                2022:(2022 + input$years - 1)))
+                                2022:(2022 + n_col - 1)))
 
     m
 
@@ -45,18 +47,13 @@ output$download <- downloadHandler(
 
 # Matrix ------------------------------------------------------------------
 
-  output$m <- renderUI({
-    col_names <- 2022:(2022 + input$years - 1)
-    matrixInput("industry_input",
-                class = "numeric",
-                cols = list(
-                  extend = FALSE
-                ),
-                rows = list(
-                  names = TRUE
-                ),
-                value = matrix(0, nrow = 19, ncol = input$years, dimnames = list(eiat:::anzsic_swap$name, col_names))
-    )
+  observeEvent(input$years, {
+    if (is.null(input$upload)) {
+      m <- matrix(0, nrow = 19, ncol = input$years, dimnames = list(eiat:::anzsic_swap$name, 2022:(2022 + input$years - 1)))
+    } else {
+      m <- user_matrix()
+    }
+    updateMatrixInput(session, "industry_input", m)
   })
 
   observeEvent(input$random, {
@@ -78,6 +75,7 @@ output$download <- downloadHandler(
   })
 
   observeEvent(input$upload, {
+    updateNumericInput(session, "years", value = NCOL(user_matrix()))
     updateMatrixInput(session, "industry_input", user_matrix())
   })
 
