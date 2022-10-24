@@ -161,6 +161,10 @@ navbarPage("Economic Impact Assessment Tool",
 
                       )
                     ),
+                    h3("What to include in the report"),
+                    checkboxInput("report_input", "Summarise Input Data (NYI)"),
+                    checkboxInput("report_employment", "Summarise Employment Impacts (NYI)"),
+                    checkboxInput("report_grp", "Summarise Gross Regional Product Impacts (NYI)"),
                     downloadButton("report", "Generate Report")
            ),
 
