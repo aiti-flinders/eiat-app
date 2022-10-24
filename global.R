@@ -6,5 +6,6 @@ library(shinyMatrix)
 library(ggplot2)
 library(aititheme)
 library(glue)
+library(janitor)
 
 regions <- eiat:::get_available_regions(2021)
