@@ -1,3 +1,5 @@
+
+
 navbarPage("Economic Impact Assessment Tool",
            fluid = TRUE,
            theme = bslib::bs_theme(bootswatch = "flatly"),
@@ -123,12 +125,7 @@ navbarPage("Economic Impact Assessment Tool",
 
            ),
            tabPanel("Input Summary",
-                    plotOutput("input_plot"),
-                    plotOutput("input_plot_sector"),
-                    titleUI("input_table_title"),
-                    tableOutput("input_table"),
-                    titleUI("input_table_sector_title"),
-                    tableOutput("input_table_sector")
+                    inputUI("input_summary")
            ),
 
            navbarMenu("Economic Impacts",
@@ -143,6 +140,29 @@ navbarPage("Economic Impact Assessment Tool",
                                  AnnualUI("grp"),
                                  TotalUI("grp_total")
                                )
+                      )
+           ),
+
+           navbarMenu("Base Data",
+                      tabPanel("National I-O Table",
+                               h3("National I-O (19 Sectors) Table"),
+                               p("I-O tables are a means of presenting a detailed analysis of production and the use of products (goods and
+                                 services) and the income generated in the production process for a particular period, usually one year.
+                                 They show produts produced by each industry and how they are used by other industries and final users.
+                                 The tables are based on the principle that the value of hte output of each industry can be expressed as the sum
+                                 of the values of all the inputs to that industry plus any profits made. All of the products produced by
+                                 each industry are identified as being used as inputs by other industries in their production process, being sold
+                                 to final users of the products or contributing to the change in inventories."),
+                               downloadUI("download_national_io", "Download National I-O"),
+                               div(DT::dataTableOutput("national_io"), style = 'font-size: 75%; width: 100%')
+                      ),
+                      tabPanel("Regional Employment",
+                               h3("Regional Employment (FTE)"),
+                               p("Description of data"),
+                               downloadUI("download_regional_employment", "Download Regional Employment"),
+                               dataTableOutput("regional_employment")),
+                      tabPanel("Regional I-O Table",
+                               dataTableOutput("regional_io")
                       )
            ),
            tabPanel("Report",
@@ -166,17 +186,8 @@ navbarPage("Economic Impact Assessment Tool",
                     checkboxInput("report_employment", "Summarise Employment Impacts (NYI)"),
                     checkboxInput("report_grp", "Summarise Gross Regional Product Impacts (NYI)"),
                     downloadButton("report", "Generate Report")
-           ),
-
-           navbarMenu("Base Data",
-                      tabPanel("National I-O Table",
-                               tableOutput("national_io")),
-                      tabPanel("Regional Employment",
-                               tableOutput("regional_employment")),
-                      tabPanel("Regional I-O Table",
-                               tableOutput("regional_io")
-                      )
            )
+
 )
 
 

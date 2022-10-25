@@ -37,8 +37,9 @@ function(input, output, session) {
 
 
 
-  # File Download (Template) ------------------------------------------------
+  # File Downloads  ------------------------------------------------
 
+  # Template
   output$download <- downloadHandler(
     filename = function() {
       "EIAT-Template.csv"
@@ -49,6 +50,11 @@ function(input, output, session) {
       vroom::vroom_write(out, file, delim = ",")
     }
   )
+
+  # Objects
+  downloadServer("download_national_io", "National I-O (19 Sector).csv", national_19)
+  downloadServer("download_regional_employment", "Regional Employment.csv", regional_employment())
+  downloadServer("download_expenditure", "Expenditure Plot.png", )
 
 
   # Matrix ------------------------------------------------------------------
@@ -224,71 +230,51 @@ function(input, output, session) {
 
   # Inputs ------------------------------------------------------------------
 
+  inputServer("input_summary", reactive(input$lga), reactive(input$industry_input))
 
-  output$input_plot <- renderPlot({
-    input$industry_input %>%
-      as_tibble(rownames = "sector") %>%
-      pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
-      group_by(year) %>%
-      summarise(expenditure = sum(expenditure), .groups = "drop") %>%
-      ggplot(aes(x = as.factor(year), y = expenditure)) +
-      geom_col() +
-      theme_aiti() +
-      labs(x = NULL,
-           title = glue("Direct Capital Expenditure ($M) by Year in {input$lga}")) +
-      scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
-  })
-
-  output$input_table <- renderTable({
-    input$industry_input %>%
-      as_tibble(rownames = "sector") %>%
-      summarise(across(where(is.double), sum)) %>%
-      mutate(Region = input$lga,
-             .before = 1)
-  })
-
-
-  output$input_plot_sector <- renderPlot({
-    input$industry_input %>%
-      as_tibble(rownames = "sector") %>%
-      pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
-      filter(expenditure > 0) %>%
-      ggplot(aes(x = as.factor(year), y = expenditure, fill = sector)) +
-      geom_col() +
-      theme_aiti(legend = "bottom") +
-      labs(x = NULL,
-           title = glue("Direct Capital Expenditure ($M) by Industry in {input$lga}")) +
-      scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
-  })
-
-  output$input_table_sector <- renderTable({
-    input$industry_input %>%
-      rbind(colSums(input$industry_input)) %>%
-      as_tibble(rownames = "Industry Sector") %>%
-      filter(rowSums(across(where(is.double))) > 0)
-  })
 
   # Base Data ---------------------------------------------------------------
 
 
-  output$national_io <- renderTable(
-    national_19
+  output$national_io <- DT::renderDataTable(
+    datatable(national_19,
+              rownames = FALSE,
+              options = list(pageLength = 30,
+                             scrollX = TRUE)) %>%
+      formatRound(columns = c(2:length(national_19)), digits = 0)
   )
-  output$regional_employment <- renderTable(
+
+  regional_employment <- reactive({
     lq_models[[input$lga]][c("Local Employment", "Total Employment"),] %>%
-      as_tibble(rownames = "employment_type") %>%
-      pivot_longer(-employment_type,
-                   names_to = "Sector") %>%
-      pivot_wider(names_from = employment_type) %>%
-      mutate(across(where(is.double), round)) %>%
-      filter(Sector %in% LETTERS[1:19])
+    as_tibble(rownames = "employment_type") %>%
+    pivot_longer(-employment_type,
+                 names_to = "Sector") %>%
+    pivot_wider(names_from = employment_type) %>%
+    mutate(across(where(is.double), round)) %>%
+    filter(Sector %in% eiat:::anzsic_swap$name)
+  })
+
+  output$regional_employment <- renderDataTable(
+    datatable(regional_employment(),
+              rownames = FALSE)
+
 
   )
 
-  output$regional_io <- renderTable(
-    rownames = TRUE,
-    digits = 0,
-    lq_models[[input$lga]]
+
+  output$regional_io <- renderDataTable(
+    datatable(lq_models[[input$lga]],
+              rownames = TRUE,
+              options = list(pageLength = 30,
+                             scrollX = TRUE)) %>%
+      formatRound(columns = c(1:27),
+                  digits = 0)
+  )
+
+  output$multipliers <- renderDataTable(
+    multipliers(input$region) %>%
+    datatable(rownames = TRUE) %>%
+      formatRound(columns = c(2:length(.)), digits = 3)
   )
 
 }
