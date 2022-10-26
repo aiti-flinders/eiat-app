@@ -31,16 +31,16 @@ download_graph_ui <- function(id) {
     ),
     column(width = 6,
            numericInput(NS(id, "width"),
-                        "Plot width (in cm)",
-                        value = 21,
-                        min = 10
+                        "Plot width (pixels)",
+                        value = 1000,
+                        min = 1000
            )
     ),
     column(width = 6,
            numericInput(NS(id, "height"),
-                        "Plot height (cm)",
-                        value = 13,
-                        min = 8
+                        "Plot height (pixels)",
+                        value = 500,
+                        min = 500
            )
     ),
     column(width = 12,
