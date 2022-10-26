@@ -2,22 +2,23 @@
 
 navbarPage("Economic Impact Assessment Tool",
            fluid = TRUE,
-           theme = bslib::bs_theme(bootswatch = "flatly"),
+           theme = bslib::bs_theme(
+             bootswatch = "lumen"),
            tabPanel("Description",
                     fluidRow(
                       column(width = 7, id = "grey",
                              tags$style("#grey {background-color: white;}"),
-                             h3("Economic Impact Analysis Tool"),
+                             h1("Economic Impact Analysis Tool", class = "text-primary"),
                              p("EIAT is an online input-output (I-O) analysis tool for Local Goverment Areas across Australia.
                       It has been developed by the Australian Industrial Transformation Institute at Flinders University,
                       in conjunction with AURIN. This tool is designed to enable users to conduct regional economic impact analyses."),
-                      h3("Input-Output Models"),
+                      h1("Input-Output Models"),
                       p("Input-Output models provide a standard approach for the estimation of the economic impact of a particular activity
                       (e.g. construction of a new infrastructure project). A regional economic impact statement regarding the impact of
                       major projects and policies has become a critical part of regional development analysis, and is an extensive component
                       of the applied economic literature. The linkages between employment opportunities and residents - and business to business linkages affect
                       urban design and transport systems, infrasftructure demand, and regional taxes, amongst others."),
-                      h3("Using the Economic Impact Analysis Tool"),
+                      h1("Using the Economic Impact Analysis Tool"),
                       tags$b("The quality of an economic impact assessment is dependent on the quality of input data.", style = 'color:red'),
                       p("The analyst is required to enter the direct capital expenditures assosciated with the investment project of interest.
                              These expenditures must be expressed in millions of dollars ($M) in basic or producer prices which exclude margins,
@@ -27,7 +28,7 @@ navbarPage("Economic Impact Assessment Tool",
                              should also include a summary of the data used to generate the impact."),
                       p("For simple projects, the user may enter data directly into the Data Input panel in Project Setup. For more complex analyses,
                              the user may download an excel template, enter the expenditure, and upload to the tool."),
-                      h3("Important Assumptions"),
+                      h1("Important Assumptions"),
                       p("The use of an input-output model imposes a number of assumptions which must be considered in interpreting the predicted impacts.
                              They include:",
                         tags$ol(
@@ -38,7 +39,7 @@ navbarPage("Economic Impact Assessment Tool",
                           tags$li("The model is a static model that does not take into account the dynamic processes involved in the adjustment to an external change.")
                         )
                       ),
-                      h3("Required Information"),
+                      h1("Required Information"),
                       p("Before using input-output analysis to estimate the economic impact of regional expenditure, the user is required to collect information.
                              The analyst must know the magnitude of various expenditures and where they occur. Also needed is information on how the sectors recieving this
                              expenditure share their expenditures among the various sectors from whom they buy, and so on, for the further expenditure rounds. While private
@@ -91,7 +92,7 @@ navbarPage("Economic Impact Assessment Tool",
                                  download a file called 'EIAT-Template.csv', which can be opened in Microsoft Excel, OpenOffice, or Google
                                  Sheets. You may give the file any name which you prefer, but the extension should remain 'Comma Separated Values (.csv)'.
                                  Data created using the template can then be uploaded, using the upload data button.",
-                                 "Please check that"),
+                                 "Please check that the data has been enterered correctly before proceeding."),
                                matrixInput("industry_input",
                                            class = "numeric",
                                            cols = list(
