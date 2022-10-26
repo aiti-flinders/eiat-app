@@ -166,66 +166,16 @@ function(input, output, session) {
 
 
 
-  output$grp <- DT::renderDataTable({
-    impact_analysis(region = input$lga,
-                    impacts = input$industry_input) %>%
-      .[["grp"]] %>%
-      mutate(value = sprintf(value, fmt = "%.2f")) %>%
-      filter(year == input$select_year_grp) %>%
-      pivot_wider(id_cols = c(year, Sector), names_from = type, values_from = value) %>%
-      select(Sector, `Direct GRP`, `Flow on GRP`, `Total GRP`) %>%
-      datatable(colnames = c("Sector", "Direct", "Flow-on", "Total"), rownames = FALSE)
-  })
-
-  output$grp_table <- renderTable({
-    impact_analysis(region = input$lga,
-                    impacts = input$industry_input) %>%
-      .[["grp"]] %>%
-      pivot_wider(names_from = year) %>%
-      group_by(type) %>%
-      summarise(across(where(is.double), sum), .groups = "drop") %>%
-      filter(type %in% c("Direct GRP",
-                         "Flow on GRP",
-                         "Total GRP"))
-  })
-
-  output$grp_table_sector <- renderTable({
-    d <- impact_analysis(region = input$lga,
-                         impacts = input$industry_input) %>%
-      .[["grp"]] %>%
-      pivot_wider(names_from = year) %>%
-      group_by(Sector) %>%
-      summarise(across(where(is.double), sum), .groups = "drop")
-
-    rbind(d, c(NA, colSums(d[, 2:11])))
-  })
 
 
 
-  output$grp_plot <- renderPlot({
-    impact_analysis(region = input$lga,
-                    impacts = input$industry_input) %>%
-      .[["grp"]] %>%
-      group_by(type, year) %>%
-      summarise(value = sum(value), .groups = "drop") %>%
-      ggplot(aes(x = year, y = value, col = type, group = type)) +
-      geom_line() +
-      theme_aiti(legend = "bottom") +
-      labs(title = glue("Gross Regional Impact ($M) in {input$lga}"))
-  })
 
-  output$grp_plot_sector <- renderPlot({
-    impact_analysis(region = input$lga,
-                    impacts = input$industry_input) %>%
-      .[["grp"]] %>%
-      group_by(year, Sector) %>%
-      summarise(value = sum(value), .groups = "drop") %>%
-      ggplot(aes(x = year, y = value, fill = Sector)) +
-      geom_col(position = "dodge") +
-      theme_aiti(legend = "bottom") +
-      labs(x = NULL,
-           title = glue("Gross Regional Impact ($M) by Industry in {input$lga}"))
-  })
+
+
+
+
+
+
 
 
   # Inputs ------------------------------------------------------------------
