@@ -101,8 +101,7 @@ AnnualServer <- function(id, tab, region, impact) {
           labs(x = NULL,
                title = title) +
           x_axis +
-          theme_aiti(legend = "bottom",
-                     flipped = TRUE)
+          theme_aiti(flipped = TRUE)
 
 
       })

@@ -70,8 +70,7 @@ TotalServer <- function(id, tab, region, impact) {
           summarise(value = sum(value), .groups = "drop") %>%
           ggplot(aes(x = year, y = value, fill = type)) +
           geom_col() +
-          theme_aiti(flipped = TRUE,
-                     legend = "bottom") +
+          theme_aiti(flipped = TRUE) +
           labs(x = NULL)
 
 

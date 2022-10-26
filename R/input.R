@@ -3,14 +3,16 @@ inputUI <- function(id) {
 
   tabsetPanel(
     tabPanel("Summary Tables",
+             uiOutput(ns("title1")),
              dataTableOutput(ns("input_table")),
+             uiOutput(ns('title2')),
              dataTableOutput(ns("input_table_sector"))
     ),
     tabPanel("Summary Graphs",
              selectInput(ns("input_type"),
                          label = NULL,
                          choices = c("Direct Capital Expenditure", "Direct Capital Expenditure by Industry")),
-             plotOutput(ns("plot")),
+             plotOutput(ns("plot"), height = "500px"),
              h3("Download Graphs"),
              download_graph_ui(id)
 
@@ -32,9 +34,11 @@ inputServer <- function(id, region, impact) {
             pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
             group_by(year) %>%
             summarise(expenditure = sum(expenditure), .groups = "drop") %>%
-            ggplot(aes(x = as.factor(year), y = expenditure), fill = aiti_blue) +
+            ggplot(aes(x = as.factor(year), y = expenditure)) +
             geom_col() +
+            theme_aiti() +
             labs(x = NULL,
+                 y = NULL,
                  title = glue("Direct Capital Expenditure ($M) by Year in {region()}")) +
             scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
         } else {
@@ -44,7 +48,9 @@ inputServer <- function(id, region, impact) {
             filter(expenditure > 0) %>%
             ggplot(aes(x = as.factor(year), y = expenditure, fill = sector)) +
             geom_col() +
+            theme_aiti() +
             labs(x = NULL,
+                 y = NULL,
                  title = glue("Direct Capital Expenditure ($M) by Industry in {region()}")) +
             scale_y_continuous(labels = scales::dollar_format(suffix = "M")) +
             guides(fill = guide_legend(nrow = 2))
@@ -62,7 +68,8 @@ inputServer <- function(id, region, impact) {
           as_tibble(rownames = "sector") %>%
           summarise(across(where(is.double), sum)) %>%
           mutate(Region = region(),
-                 .before = 1)
+                 .before = 1) %>%
+          datatable(rownames = FALSE)
       })
 
 
@@ -70,7 +77,17 @@ inputServer <- function(id, region, impact) {
         impact() %>%
           rbind(colSums(impact())) %>%
           as_tibble(rownames = "Industry Sector") %>%
-          filter(rowSums(across(where(is.double))) > 0)
+          filter(rowSums(across(where(is.double))) > 0) %>%
+          datatable(rownames = FALSE)
+      })
+
+
+
+      output$title1 <- renderUI({
+        h1(glue("Direct Capital Expenditure ($M) in {region()}"), class = 'text-primary')
+      })
+      output$title2 <- renderUI({
+        h1(glue("Direct Capital Expenditure ($M) by Industry in {region()}"), class = 'text-primary')
       })
 
       output$download_plot <- downloadHandler(
@@ -80,8 +97,12 @@ inputServer <- function(id, region, impact) {
         content = function(file) {
           thematic_save_plot(create_plot(),
                              device = default_device(input$filetype),
-                             filename = file)
+                             filename = file,
+                             width = input$width,
+                             height = input$height)
         }
+
+
       )
     }
   )
