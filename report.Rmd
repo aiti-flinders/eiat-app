@@ -40,49 +40,79 @@ That data looks like this, over time:
 
 ```{r, input_time, include = params$include_input}
 params$data %>%
-      as_tibble(rownames = "sector") %>%
-      pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
-      group_by(year) %>%
-      summarise(expenditure = sum(expenditure), .groups = "drop") %>%
-      ggplot(aes(x = as.factor(year), y = expenditure)) +
-      geom_col() +
-      theme_aiti() +
-      labs(x = NULL,
-           title = glue("Direct Capital Expenditure ($M) by Year in {params$region}")) +
-      scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
+  as_tibble(rownames = "sector") %>%
+  pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
+  group_by(year) %>%
+  summarise(expenditure = sum(expenditure), .groups = "drop") %>%
+  ggplot(aes(x = as.factor(year), 
+             y = expenditure)) +
+  geom_col(fill = aiti_blue) +
+  theme_aiti() +
+  labs(x = NULL,
+       title = glue("Direct Capital Expenditure ($M) by Year in {params$region}")) +
+  scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
 ```
 
 And like this, by industry:
 
 ```{r, input_sector, include = params$include_input}
 params$data %>%
-      as_tibble(rownames = "sector") %>%
-      pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
-      filter(expenditure > 0) %>%
-      ggplot(aes(x = as.factor(year), y = expenditure, fill = sector)) +
-      geom_col() +
-      theme_aiti(legend = "bottom") +
-      labs(x = NULL,
-           title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
-      scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
+  as_tibble(rownames = "sector") %>%
+  pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
+  filter(expenditure > 0) %>%
+  ggplot(aes(x = as.factor(year), y = expenditure, fill = sector)) +
+  geom_col() +
+  theme_aiti() +
+  labs(x = NULL,
+       title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
+  scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
 ```
 
-#### Employment Impacts
+### Employment Impacts
 
-This project is estimate to generate [x] jobs over [x] years. [x] of these jobs are generated as a result of the direct capital expenditure, and the remaining [x] jobs are generated through this expenditure flowing through to other sectors of the economy.
+```{r data}
+emp_data <- impact_analysis(region = params$region,
+                            impacts = params$data) %>%
+  .[["emp"]] %>%
+  filter(grepl("Direct|Flow on", type)) %>%
+  group_by(year, type) %>%
+  summarise(value = sum(value), .groups = "drop") 
+
+grp_data <- impact_analysis(region = params$region,
+                            impacts = params$data) %>%
+  .[["grp"]] %>%
+  filter(grepl("Direct|Flow on", type)) %>%
+  group_by(year, type) %>%
+  summarise(value = sum(value), .groups = "drop") 
+```
+
+This project is estimated to generate `r round(sum(emp_data$value))` jobs over `r max(as.numeric(emp_data$year)) - min(as.numeric(emp_data$year))` years. `r  round(sum(emp_data[emp_data$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  round(sum(emp_data[emp_data$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy.
 
 Figure \@ref(fig:emp) shows the employment impacts of this project over time.
 
 ```{r emp, fig.cap = "Employment Impacts"}
-       impact_analysis(region = params$region,
-                        impacts = params$data) %>%
-          .[["emp"]]%>%
-          filter(grepl("Direct|Flow on", type)) %>%
-          group_by(year, type) %>%
-          summarise(value = sum(value), .groups = "drop") %>%
-          ggplot(aes(x = year, y = value, col = type, group = type)) +
-          geom_line() +
-          theme_aiti(legend = "bottom") +
-          labs(x = NULL)
+emp_data %>%
+  ggplot(aes(x = year, y = value, col = type, group = type)) +
+  geom_line() +
+  theme_aiti() +
+  labs(x = NULL,
+       y = NULL,
+       title = "Employment Impacts")
 
+```
+
+### Gross Regional Product Impacts
+
+This project is estimated to generate `r round(sum(grp_data$value))` jobs over `r max(as.numeric(grp_data$year)) - min(as.numeric(grp_data$year))` years. `r  round(sum(grp_data[grp_data$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  round(sum(grp_data[grp_data$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy.
+
+Figure \@ref(fig:emp) shows the employment impacts of this project over time.
+
+``` {r grp, fig.cap = "Gross Regional Product Impacts"}
+grp_data %>%
+  ggplot(aes(x = year, y = value, col = type, group = type)) +
+  geom_line() +
+  theme_aiti() +
+  labs(x = NULL,
+       y = NULL,
+       title = "Gross Regional Product Impacts")
 ```
