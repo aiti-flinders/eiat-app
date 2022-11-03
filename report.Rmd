@@ -1,15 +1,41 @@
 ---
-title: "Economic Impact Analysis - `r params$title`"
-output: bookdown::html_document2
+title: "Economic Impact Analysis"
+output: 
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: false    
+    includes:
+      in_header: preamble-latex.tex
+header-includes:
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{array}
+- \usepackage{multirow}
+- \usepackage{wrapfig}
+- \usepackage{float}
+- \usepackage{colortbl}
+- \usepackage{pdflscape}
+- \usepackage{tabu}
+- \usepackage{threeparttable}        
 author: "Prepared by `r params$author`"
 params:
-  title: "Test Title"
-  description: "Test project description a really long description too wow thats so much detail!"
-  author: "Hamish"
-  data: !r matrix(round(runif(38, 0, 2)), nrow = 19, ncol = 2, dimnames = list(eiat:::anzsic_swap$name, 2022:2023))
+  title: "Project Title"
+  description: "This report was generated automatically via the Economic Impact Assessment Tool."
+  author: "EIAT-APP"
+  data: !r matrix(round(runif(19*10, 0, 1)), nrow = 19, ncol = 10, dimnames = list(eiat:::anzsic_swap$name, 2022:(2022+9)))
   region: "Adelaide"
   date: !r lubridate::today()
-  include_input: TRUE
+  include_tables: !r c("Direct employment impacts",
+                                                            "Direct GRP impacts",
+                                                            "Flow-on employment impacts",
+                                                            "Flow-on GRP impacts",
+                                                            "Total employment impacts",
+                                                            "Total GRP impacts",
+                                                            "Summary employment impacts",
+                                                            "Summary GRP impacts")
+  include_graphs: !r c("Summary input data",
+                                                            "Employment impacts",
+                                                            "GRP impacts")
 ---
 
 ```{r setup, include = FALSE}
@@ -18,27 +44,54 @@ library(tidyr)
 library(ggplot2)
 library(aititheme)
 library(glue)
+library(janitor)
 library(eiat)
-knitr::opts_chunk$set(echo = FALSE)
+library(kableExtra)
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.height = 3.75)
 ```
 
-`r params$description`
+```{r title, results='asis', include = params$title != ""}
+cat("#", params$title)
+```
 
-### Data Supplied
 
-You supplied the following input data:
+```{r description,  results = "asis", include = params$description != ""}
+cat(params$description)
+```
+
+## Disclaimer
+
+The EIAT is an online input-output (I-O) analysis tool for Local Goverment Areas across Australia, developed by the Australian Industrial Transformation Institute at Flinders University, in conjunction with AURIN. This tool is designed to enable users to conduct regional economic impact analyses.
+
+Input-Output models provide a standard approach for the estimation of the economic impact of a particular activity (e.g. construction of a new infrastructure project). A regional economic impact statement regarding the impact of major projects and policies has become a critical part of regional development analysis, and is an extensive component of the applied economic literature. The linkages between employment opportunities and residents - and business to business linkages affect urban design and transport systems, infrasftructure demand, and regional taxes, amongst others.
+
+This report was generated with EIAT Version: `r eiat:::eiat_version()` on `r Sys.Date()`.
+
+
+## Data Supplied
+
+The direct capital expenditure change estimated to occur in `r params$region` is shown in Table \@ref(tab:input).
 
 ```{r input, echo = FALSE}
-knitr::kable(
-  params$data
-)
+params$data %>%
+  as_tibble(rownames = "Industry") %>%
+  adorn_totals() %>%
+  kbl(caption = "Estimated regional demand change, (\\$M)",
+      booktabs = TRUE) %>%
+  kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
+  column_spec(1, width = "7cm") %>%
+  row_spec(nrow(params$data) + 1, bold = T)
 ```
 
-#### Input Summary
+\clearpage
 
-That data looks like this, over time:
+```{r total-input, fig.cap = "Direct Capital Expenditure Summary", include = "Summary input data" %in% params$include_graphs,  results = 'asis'}
 
-```{r, input_time, include = params$include_input}
+cat("## Input Summary\n")
+
+cat("Figure @ref(fig:total-input) summarises the total direct capital expenditure estimated to occur each year of the project.\n\n")
+
 params$data %>%
   as_tibble(rownames = "sector") %>%
   pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
@@ -46,73 +99,241 @@ params$data %>%
   summarise(expenditure = sum(expenditure), .groups = "drop") %>%
   ggplot(aes(x = as.factor(year), 
              y = expenditure)) +
-  geom_col(fill = aiti_blue) +
-  theme_aiti() +
+  geom_col(fill = aiti_darkblue) +
+  theme_aiti(colour = "grey") +
   labs(x = NULL,
+       y = NULL,
        title = glue("Direct Capital Expenditure ($M) by Year in {params$region}")) +
   scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
+
 ```
 
-And like this, by industry:
+```{r industry-input, results = 'asis', fig.cap = "Direct Capital Expenditure Summary by Industry", include = "Summary input data" %in% params$include_graphs}
 
-```{r, input_sector, include = params$include_input}
+cat("Figure @ref(fig:industry-input) summarises the direct capital expenditure estimated to occur for each industry and year of the project.\n\n")
+
 params$data %>%
   as_tibble(rownames = "sector") %>%
   pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
-  filter(expenditure > 0) %>%
+  filter(expenditure != 0) %>%
   ggplot(aes(x = as.factor(year), y = expenditure, fill = sector)) +
   geom_col() +
   theme_aiti() +
   labs(x = NULL,
+       y = NULL, 
        title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
   scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
 ```
 
-### Employment Impacts
-
 ```{r data}
 emp_data <- impact_analysis(region = params$region,
                             impacts = params$data) %>%
-  .[["emp"]] %>%
-  filter(grepl("Direct|Flow on", type)) %>%
-  group_by(year, type) %>%
-  summarise(value = sum(value), .groups = "drop") 
+  .[["emp"]] 
 
 grp_data <- impact_analysis(region = params$region,
                             impacts = params$data) %>%
-  .[["grp"]] %>%
-  filter(grepl("Direct|Flow on", type)) %>%
-  group_by(year, type) %>%
-  summarise(value = sum(value), .groups = "drop") 
+  .[["grp"]] 
 ```
 
-This project is estimated to generate `r round(sum(emp_data$value))` jobs over `r max(as.numeric(emp_data$year)) - min(as.numeric(emp_data$year))` years. `r  round(sum(emp_data[emp_data$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  round(sum(emp_data[emp_data$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy.
+\clearpage
 
-Figure \@ref(fig:emp) shows the employment impacts of this project over time.
+## Employment Impacts
 
-```{r emp, fig.cap = "Employment Impacts"}
+This project is estimated to generate `r scales::comma_format()(sum(emp_data$value))` jobs over `r max(as.numeric(emp_data$year)) - min(as.numeric(emp_data$year)) + 1` year(s). `r  round(sum(emp_data[emp_data$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  round(sum(emp_data[emp_data$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy. 
+
+```{r emp-graph, fig.cap = "Employment Impacts", include = "Employment impacts" %in% params$include_graphs, results = 'asis'}
+
+cat("Figure @ref(fig:emp-graph) shows the employment impacts of this project over time.\n\n")
+
 emp_data %>%
+  filter(grepl("Direct|Flow on|Total", type)) %>%
+  group_by(year, type) %>%
+  summarise(value = sum(value), .groups = "drop") %>%
   ggplot(aes(x = year, y = value, col = type, group = type)) +
   geom_line() +
   theme_aiti() +
+  scale_colour_aiti() + 
   labs(x = NULL,
        y = NULL,
        title = "Employment Impacts")
 
 ```
 
-### Gross Regional Product Impacts
 
-This project is estimated to generate `r round(sum(grp_data$value))` jobs over `r max(as.numeric(grp_data$year)) - min(as.numeric(grp_data$year))` years. `r  round(sum(grp_data[grp_data$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  round(sum(grp_data[grp_data$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy.
+```{r emp-direct-table, include = "Direct employment impacts" %in% params$include_tables, results = 'asis'}
 
-Figure \@ref(fig:emp) shows the employment impacts of this project over time.
+cat("Table @ref(tab:emp-direct-table) summarises the estimated *Direct Employment* impacts induced by the change in final demand associated with this project. Direct impacts are those which occur only as a result of the increased demand in each sector. \n\n")
 
-``` {r grp, fig.cap = "Gross Regional Product Impacts"}
+emp_data %>% 
+  filter(type == "Direct Employment") %>%
+  select(-type) %>% 
+  pivot_wider(names_from = year) %>%
+  adorn_totals() %>% 
+  mutate(across(where(is.numeric), ~round(.x))) %>%
+  kbl(digits = 0,
+      caption = "Estimated Direct employment impacts by industry by year.",
+      booktabs = TRUE) %>%
+  kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
+  column_spec(1, width = "7cm") %>%
+  row_spec(nrow(params$data) + 1, bold = T)
+
+
+```
+
+
+```{r emp-flow-on-table, include = "Flow-on employment impacts" %in% params$include_tables, results = 'asis'}
+cat("Table @ref(tab:emp-flow-on-table) summarises the estimated *Flow on Employment* impacts induced by the change in final demand associated with this project. Flow on impacts are those which occur through industrial linkages between different sectors of the economy. \n\n")
+
+emp_data %>% 
+  filter(type == "Flow on Employment") %>%
+  select(-type) %>% 
+  pivot_wider(names_from = year) %>%
+  adorn_totals() %>% 
+  kbl(digits = 0,
+      caption = "Estimated Flow on employment impacts by industry by year.",
+      booktabs = TRUE)  %>%
+  kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
+  column_spec(1, width = "7cm") %>%
+  row_spec(nrow(params$data) + 1, bold = T)
+
+```
+
+
+```{r emp-total-table, include = "Total employment impacts" %in% params$include_tables, results = 'asis'}
+cat("Table @ref(tab:emp-total-table) sumamries the esimtated *Total Employment* impacts induced by the change in final demand associated with this project. Total employment is the sum of direct and flow-on employment.\n\n")
+
+emp_data %>% 
+  filter(type == "Total Employment") %>%
+  select(-type) %>% 
+  pivot_wider(names_from = year) %>%
+  adorn_totals() %>% 
+  kbl(digits = 0,
+      caption = "Estimated Total employment impacts by industry by year.",
+      booktabs = TRUE)  %>%
+  kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
+  column_spec(1, width = "7cm") %>%
+  row_spec(nrow(params$data) + 1, bold = T)
+
+```
+
+
+```{r emp-total-total-table, include = "Summary employment impacts" %in% params$include_tables, results = 'asis'}
+cat("Table @ref(tab:emp-total-total-table) summarises the Direct, Flow-on, and Total employment impacts across each year of direct final expenditure impacts\n\n")
+
+emp_data %>% 
+  filter(grepl("Direct|Flow on|Total", type)) %>%
+  group_by(year, type) %>%
+  summarise(value = sum(value), .groups = "drop") %>%
+  ungroup() %>%
+  pivot_wider(names_from = year) %>%
+  rename(`Employment type` = type) %>%
+  kbl(digits = 0,
+      caption = "Estimated employment impacts by year.",
+      booktabs = TRUE)  %>%
+  kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
+  column_spec(1, width = "5cm") %>%
+  row_spec(3 , bold = T)
+```
+
+\clearpage
+
+## Gross Regional Product Impacts
+
+This project is estimated to generate `r round(sum(grp_data$value))` million dollars in Gross Regional Product (GRP) over `r max(as.numeric(grp_data$year)) - min(as.numeric(grp_data$year)) + 1` year(s). `r round(sum(grp_data[grp_data$type == "Direct GRP",]$value))` of this is generated as a result of the direct capital expenditure, and the remaining `r  round(sum(grp_data[grp_data$type == "Flow on GRP",]$value))` is generated through this expenditure flowing through to other sectors of the economy.
+
+```{r grp, fig.cap = "Gross Regional Product Impacts", results = 'asis', include = "GRP impacts" %in% params$include_graphs}
+
+cat("Figure @ref(fig:grp) shows the GRP impacts of this project over time.\n\n")
+
 grp_data %>%
+  filter(grepl("Direct|Flow on|Total", type)) %>%
+  group_by(year, type) %>%
+  summarise(value = sum(value), .groups = "drop") %>%
   ggplot(aes(x = year, y = value, col = type, group = type)) +
   geom_line() +
   theme_aiti() +
+  scale_colour_aiti() + 
+  scale_y_continuous(labels = scales::dollar_format(suffix = "M")) + 
   labs(x = NULL,
        y = NULL,
        title = "Gross Regional Product Impacts")
 ```
+
+```{r grp-direct-table, include = "Direct GRP impacts" %in% params$include_tables, results = 'asis'}
+
+cat("Table @ref(tab:grp-direct-table) summarises the estimated *Direct GRP* impacts induced by the change in final demand associated with this project. Direct impacts are those which occur only as a result of the increased demand in each sector. \n\n")
+
+grp_data %>% 
+  filter(type == "Direct GRP") %>%
+  select(-type) %>% 
+  pivot_wider(names_from = year) %>%
+  adorn_totals() %>% 
+  mutate(across(where(is.numeric), ~round(.x))) %>%
+  kbl(digits = 1,
+      caption = "Estimated Direct GRP impacts by industry by year.",
+      booktabs = TRUE) %>%
+  kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
+  column_spec(1, width = "7cm") %>%
+  row_spec(nrow(params$data) + 1, bold = T)
+
+
+```
+
+
+```{r grp-flow-on-table, include = "Flow-on GRP impacts" %in% params$include_tables, results = 'asis'}
+cat("Table @ref(tab:grp-flow-on-table) summarises the estimated *Flow on GRP* impacts induced by the change in final demand associated with this project. Flow on impacts are those which occur through industrial linkages between different sectors of the economy. \n\n")
+
+grp_data %>% 
+  filter(type == "Flow on GRP") %>%
+  select(-type) %>% 
+  pivot_wider(names_from = year) %>%
+  adorn_totals() %>% 
+  kbl(digits = 1,
+      caption = "Estimated Flow on GRP impacts by industry by year.",
+      booktabs = TRUE)  %>%
+  kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
+  column_spec(1, width = "7cm") %>%
+  row_spec(nrow(params$data) + 1, bold = T)
+
+```
+
+
+```{r grp-total-table, include = "Total GRP impacts" %in% params$include_tables, results = 'asis'}
+cat("Table @ref(tab:grp-total-table) sumamries the esimtated *Total GRP* impacts induced by the change in final demand associated with this project. Total GRP is the sum of direct and flow-on GRP\n\n")
+
+grp_data %>% 
+  filter(type == "Total GRP") %>%
+  select(-type) %>% 
+  pivot_wider(names_from = year) %>%
+  adorn_totals() %>% 
+  kbl(digits = 1,
+      caption = "Estimated Total GRP impacts by industry by year.",
+      booktabs = TRUE)  %>%
+  kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
+  column_spec(1, width = "7cm") %>%
+  row_spec(nrow(params$data) + 1, bold = T)
+
+```
+
+
+```{r grp-total-total-table, include = "Summary GRP impacts" %in% params$include_tables, results = 'asis'}
+cat("Table @ref(tab:grp-total-total-table) summarises the Direct, Flow-on, and Total GRP impacts across each year of direct final expenditure impacts\n\n")
+
+grp_data %>% 
+  filter(grepl("Direct|Flow on|Total", type)) %>%
+  group_by(year, type) %>%
+  summarise(value = sum(value), .groups = "drop") %>%
+  ungroup() %>%
+  pivot_wider(names_from = year) %>%
+  rename(`Employment type` = type) %>%
+  kbl(digits = 1,
+      caption = "Estimated GRP impacts by year.",
+      booktabs = TRUE)  %>%
+  kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
+  column_spec(1, width = "5cm") %>%
+  row_spec(3 , bold = T)
+```
+
+
+
+
