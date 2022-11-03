@@ -47,6 +47,7 @@ library(glue)
 library(janitor)
 library(eiat)
 library(kableExtra)
+library(shiny)
 knitr::opts_chunk$set(echo = FALSE,
                       fig.height = 3.75)
 ```
@@ -54,7 +55,6 @@ knitr::opts_chunk$set(echo = FALSE,
 ```{r title, results='asis', include = params$title != ""}
 cat("#", params$title)
 ```
-
 
 ```{r description,  results = "asis", include = params$description != ""}
 cat(params$description)
@@ -67,7 +67,6 @@ The EIAT is an online input-output (I-O) analysis tool for Local Goverment Areas
 Input-Output models provide a standard approach for the estimation of the economic impact of a particular activity (e.g. construction of a new infrastructure project). A regional economic impact statement regarding the impact of major projects and policies has become a critical part of regional development analysis, and is an extensive component of the applied economic literature. The linkages between employment opportunities and residents - and business to business linkages affect urban design and transport systems, infrasftructure demand, and regional taxes, amongst others.
 
 This report was generated with EIAT Version: `r eiat:::eiat_version()` on `r Sys.Date()`.
-
 
 ## Data Supplied
 
@@ -82,6 +81,8 @@ params$data %>%
   kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
   column_spec(1, width = "7cm") %>%
   row_spec(nrow(params$data) + 1, bold = T)
+
+if (shiny::isRunning()) {setProgress(0.1)}
 ```
 
 \clearpage
@@ -105,12 +106,19 @@ params$data %>%
        y = NULL,
        title = glue("Direct Capital Expenditure ($M) by Year in {params$region}")) +
   scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
-
+if (shiny::isRunning()) {setProgress(0.2)}
 ```
 
 ```{r industry-input, results = 'asis', fig.cap = "Direct Capital Expenditure Summary by Industry", include = "Summary input data" %in% params$include_graphs}
 
 cat("Figure @ref(fig:industry-input) summarises the direct capital expenditure estimated to occur for each industry and year of the project.\n\n")
+
+l <- params$data %>%
+  as_tibble(rownames = "sector") %>%
+  pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
+  filter(expenditure != 0) %>% 
+  distinct(sector) %>%
+  nrow()
 
 params$data %>%
   as_tibble(rownames = "sector") %>%
@@ -122,7 +130,9 @@ params$data %>%
   labs(x = NULL,
        y = NULL, 
        title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
+  guides(fill = guide_legend(nrow = ceiling((l/19)*7)))+ 
   scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
+if (shiny::isRunning()) {setProgress(0.3)}
 ```
 
 ```{r data}
@@ -139,7 +149,7 @@ grp_data <- impact_analysis(region = params$region,
 
 ## Employment Impacts
 
-This project is estimated to generate `r scales::comma_format()(sum(emp_data$value))` jobs over `r max(as.numeric(emp_data$year)) - min(as.numeric(emp_data$year)) + 1` year(s). `r  round(sum(emp_data[emp_data$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  round(sum(emp_data[emp_data$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy. 
+This project is estimated to generate `r scales::comma_format()(sum(emp_data$value))` jobs over `r max(as.numeric(emp_data$year)) - min(as.numeric(emp_data$year)) + 1` year(s). `r  round(sum(emp_data[emp_data$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  round(sum(emp_data[emp_data$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy.
 
 ```{r emp-graph, fig.cap = "Employment Impacts", include = "Employment impacts" %in% params$include_graphs, results = 'asis'}
 
@@ -157,8 +167,8 @@ emp_data %>%
        y = NULL,
        title = "Employment Impacts")
 
+if (shiny::isRunning()) {setProgress(0.4)}
 ```
-
 
 ```{r emp-direct-table, include = "Direct employment impacts" %in% params$include_tables, results = 'asis'}
 
@@ -177,9 +187,8 @@ emp_data %>%
   column_spec(1, width = "7cm") %>%
   row_spec(nrow(params$data) + 1, bold = T)
 
-
+if (shiny::isRunning()) {setProgress(0.5)}
 ```
-
 
 ```{r emp-flow-on-table, include = "Flow-on employment impacts" %in% params$include_tables, results = 'asis'}
 cat("Table @ref(tab:emp-flow-on-table) summarises the estimated *Flow on Employment* impacts induced by the change in final demand associated with this project. Flow on impacts are those which occur through industrial linkages between different sectors of the economy. \n\n")
@@ -196,8 +205,8 @@ emp_data %>%
   column_spec(1, width = "7cm") %>%
   row_spec(nrow(params$data) + 1, bold = T)
 
+if (shiny::isRunning()) {setProgress(0.6)}
 ```
-
 
 ```{r emp-total-table, include = "Total employment impacts" %in% params$include_tables, results = 'asis'}
 cat("Table @ref(tab:emp-total-table) sumamries the esimtated *Total Employment* impacts induced by the change in final demand associated with this project. Total employment is the sum of direct and flow-on employment.\n\n")
@@ -214,8 +223,8 @@ emp_data %>%
   column_spec(1, width = "7cm") %>%
   row_spec(nrow(params$data) + 1, bold = T)
 
+if (shiny::isRunning()) {setProgress(0.7)}
 ```
-
 
 ```{r emp-total-total-table, include = "Summary employment impacts" %in% params$include_tables, results = 'asis'}
 cat("Table @ref(tab:emp-total-total-table) summarises the Direct, Flow-on, and Total employment impacts across each year of direct final expenditure impacts\n\n")
@@ -233,6 +242,8 @@ emp_data %>%
   kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
   column_spec(1, width = "5cm") %>%
   row_spec(3 , bold = T)
+
+if (shiny::isRunning()) {setProgress(0.8)}
 ```
 
 \clearpage
@@ -257,6 +268,8 @@ grp_data %>%
   labs(x = NULL,
        y = NULL,
        title = "Gross Regional Product Impacts")
+
+if (shiny::isRunning()) {setProgress(0.9)}
 ```
 
 ```{r grp-direct-table, include = "Direct GRP impacts" %in% params$include_tables, results = 'asis'}
@@ -279,7 +292,6 @@ grp_data %>%
 
 ```
 
-
 ```{r grp-flow-on-table, include = "Flow-on GRP impacts" %in% params$include_tables, results = 'asis'}
 cat("Table @ref(tab:grp-flow-on-table) summarises the estimated *Flow on GRP* impacts induced by the change in final demand associated with this project. Flow on impacts are those which occur through industrial linkages between different sectors of the economy. \n\n")
 
@@ -296,7 +308,6 @@ grp_data %>%
   row_spec(nrow(params$data) + 1, bold = T)
 
 ```
-
 
 ```{r grp-total-table, include = "Total GRP impacts" %in% params$include_tables, results = 'asis'}
 cat("Table @ref(tab:grp-total-table) sumamries the esimtated *Total GRP* impacts induced by the change in final demand associated with this project. Total GRP is the sum of direct and flow-on GRP\n\n")
@@ -315,7 +326,6 @@ grp_data %>%
 
 ```
 
-
 ```{r grp-total-total-table, include = "Summary GRP impacts" %in% params$include_tables, results = 'asis'}
 cat("Table @ref(tab:grp-total-total-table) summarises the Direct, Flow-on, and Total GRP impacts across each year of direct final expenditure impacts\n\n")
 
@@ -332,8 +342,6 @@ grp_data %>%
   kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
   column_spec(1, width = "5cm") %>%
   row_spec(3 , bold = T)
+
+if (shiny::isRunning()) {setProgress(1)}
 ```
-
-
-
-
