@@ -38,9 +38,9 @@ TotalServer <- function(id, tab, region, impact) {
 
       output$total_table <- renderDataTable({
 
-        validate(
-          need(sum(impact()) > 0, "Enter data in Project Setup > Data Input to calculate economic impacts. "),
-        )
+        if (all(impact() == 0)) {
+          validate("Enter data in Project Setup > Data Input to calculate economic impacts. ")
+        }
 
         impact_data() %>%
           group_by(Sector, type) %>%
@@ -60,9 +60,10 @@ TotalServer <- function(id, tab, region, impact) {
       })
 
       output$total_plot <- renderPlot({
-        validate(
-          need(sum(impact()) > 0, FALSE)
-        )
+
+        if (all(impact() == 0)) {
+          validate("Enter data in Project Setup > Data Input to calculate economic impacts. ")
+        }
 
         impact_data() %>%
           filter(grepl("Direct|Flow on", type)) %>%

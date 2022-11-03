@@ -2,8 +2,7 @@
 
 navbarPage("Economic Impact Assessment Tool",
            fluid = TRUE,
-           theme = bslib::bs_theme(
-             bootswatch = "lumen"),
+           theme = bslib::bs_theme(bootswatch = "zephyr", version = 5),
            tabPanel("Description",
                     fluidRow(
                       column(width = 7, id = "grey",
@@ -12,35 +11,35 @@ navbarPage("Economic Impact Assessment Tool",
                              p("EIAT is an online input-output (I-O) analysis tool for Local Goverment Areas across Australia.
                       It has been developed by the Australian Industrial Transformation Institute at Flinders University,
                       in conjunction with AURIN. This tool is designed to enable users to conduct regional economic impact analyses."),
-                      h1("Input-Output Models"),
-                      p("Input-Output models provide a standard approach for the estimation of the economic impact of a particular activity
+                             h1("Input-Output Models"),
+                             p("Input-Output models provide a standard approach for the estimation of the economic impact of a particular activity
                       (e.g. construction of a new infrastructure project). A regional economic impact statement regarding the impact of
                       major projects and policies has become a critical part of regional development analysis, and is an extensive component
                       of the applied economic literature. The linkages between employment opportunities and residents - and business to business linkages affect
                       urban design and transport systems, infrasftructure demand, and regional taxes, amongst others."),
-                      h1("Using the Economic Impact Analysis Tool"),
-                      tags$b("The quality of an economic impact assessment is dependent on the quality of input data.", style = 'color:red'),
-                      p("The analyst is required to enter the direct capital expenditures assosciated with the investment project of interest.
+                             h1("Using the Economic Impact Analysis Tool"),
+                             tags$b("The quality of an economic impact assessment is dependent on the quality of input data.", style = 'color:red'),
+                             p("The analyst is required to enter the direct capital expenditures assosciated with the investment project of interest.
                              These expenditures must be expressed in millions of dollars ($M) in basic or producer prices which exclude margins,
                              taxes, and subsidies. Only expenditure which is expected to occur inside the region should be entered. Expenditures that
                              occur outside of the region should be excluded from the analysis. This includes expenditure which may be allocated to a region but
                              must be imported from outside the region. The tool is agnostic to input data. Any reporting of potential economic impacts
                              should also include a summary of the data used to generate the impact."),
-                      p("For simple projects, the user may enter data directly into the Data Input panel in Project Setup. For more complex analyses,
+                             p("For simple projects, the user may enter data directly into the Data Input panel in Project Setup. For more complex analyses,
                              the user may download an excel template, enter the expenditure, and upload to the tool."),
-                      h1("Important Assumptions"),
-                      p("The use of an input-output model imposes a number of assumptions which must be considered in interpreting the predicted impacts.
+                             h1("Important Assumptions"),
+                             p("The use of an input-output model imposes a number of assumptions which must be considered in interpreting the predicted impacts.
                              They include:",
-                        tags$ol(
-                          tags$li("Increases in demand in the region are serviced by industries with constant proportions, and no significant price adjustments occur."),
-                          tags$li("Industries have a linear production function, which implies constant returns to scales and fixed input proportions."),
-                          tags$li("Firms within a sector are homogenous, which implies they produce a fixed set of products that are not produced by any other sector,
+                               tags$ol(
+                                 tags$li("Increases in demand in the region are serviced by industries with constant proportions, and no significant price adjustments occur."),
+                                 tags$li("Industries have a linear production function, which implies constant returns to scales and fixed input proportions."),
+                                 tags$li("Firms within a sector are homogenous, which implies they produce a fixed set of products that are not produced by any other sector,
                                        and that the input structure of the firms are the same."),
-                          tags$li("The model is a static model that does not take into account the dynamic processes involved in the adjustment to an external change.")
-                        )
-                      ),
-                      h1("Required Information"),
-                      p("Before using input-output analysis to estimate the economic impact of regional expenditure, the user is required to collect information.
+                                 tags$li("The model is a static model that does not take into account the dynamic processes involved in the adjustment to an external change.")
+                               )
+                             ),
+                             h1("Required Information"),
+                             p("Before using input-output analysis to estimate the economic impact of regional expenditure, the user is required to collect information.
                              The analyst must know the magnitude of various expenditures and where they occur. Also needed is information on how the sectors recieving this
                              expenditure share their expenditures among the various sectors from whom they buy, and so on, for the further expenditure rounds. While private
                              and public stakeholders are welcome to use this powerful tool to conduct input-output analysis, it is recommended that expert consultants are
@@ -60,9 +59,7 @@ navbarPage("Economic Impact Assessment Tool",
            ),
            tabPanel("Project Setup",
                     tabsetPanel(
-                      tabPanel("Parameters",
-
-                               h3("Region Selection"),
+                      tabPanel("Setup and Data Input",
                                p("Select the region for which you would like to conduct the economic impact assessment. Regions are Local Government Areas
                                  as represented by the Australian Statistical Geography Standard (ASGS) Edition 3."),
                                fluidRow(
@@ -73,15 +70,6 @@ navbarPage("Economic Impact Assessment Tool",
                                         selectInput("lga", "Select Region: ", unique(regions$lga))
                                  )
                                ),
-                               h3("Model Parameters"),
-                               splitLayout(
-                                 numericInput("productivity", "Productivity multiplier (NYI)", value = 1, max = 2, step = 0.01),
-                                 numericInput("inflation", "Inflation multiplier (NYI)", value = 1, max = 2, step = 0.01)
-                               )
-
-
-                      ),
-                      tabPanel("Data Input",
                                p("You may enter input price data data directly into the table below.
                                  This may be your preferred method if the economic impact analysis is relatively simple.
                                  Impact analyses extending beyond the current year can be conducted by selecting a timespan below.",
@@ -168,8 +156,8 @@ navbarPage("Economic Impact Assessment Tool",
            ),
            tabPanel("Report",
                     h3("Project Details"),
-                    p("Enter a name for your project, as well as a short description. These inputs will be used to generate a report of
-                                 your economic impact assessment. These inputs are optional."),
+                    p("You may generate and download a report summarising your economic impact assessment. This report can be downloaded as either
+                      a .pdf or word document"),
                     fluidRow(
                       column(width = 4,
                              textInput("project_name", "Project Name: ", placeholder = "Enter Project Name")
@@ -182,13 +170,38 @@ navbarPage("Economic Impact Assessment Tool",
 
                       )
                     ),
-                    h3("What to include in the report"),
-                    checkboxInput("report_input", "Summarise Input Data (NYI)"),
-                    checkboxInput("report_employment", "Summarise Employment Impacts (NYI)"),
-                    checkboxInput("report_grp", "Summarise Gross Regional Product Impacts (NYI)"),
-                    downloadButton("report", "Generate Report")
-           )
+                    h3("Download Report"),
+                    fluidRow(
+                      column(width = 4,
+                             textInput("filename", "Filename", placeholder = "Filename")
+                      ),
+                      column(width = 4,
+                             checkboxGroupInput(inputId = "report_tables",
+                                                label = "Table Options",
+                                                choices = c("Direct employment impacts",
+                                                            "Direct GRP impacts",
+                                                            "Flow-on employment impacts",
+                                                            "Flow-on GRP impacts",
+                                                            "Total employment impacts",
+                                                            "Total GRP impacts",
+                                                            "Summary employment impacts",
+                                                            "Summary GRP impacts"),
+                                                selected = c("Summary employment impacts", "Summary GRP impacts"))
+                      ),
+                      column(width = 4,
+                             checkboxGroupInput(inputId = "report_graphs",
+                                                label = "Graph Options",
+                                                choices = c("Summary input data",
+                                                            "Employment impacts",
+                                                            "GRP impacts"),
+                                                selected = c("Summary input data", "Employment impacts", "GRP impacts"))
+                      ),
+                      column(width = 12,
+                             downloadButton("report", "Generate Report")
+                    )
+                    )
 
+           )
 )
 
 

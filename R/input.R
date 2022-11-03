@@ -45,7 +45,7 @@ inputServer <- function(id, region, impact) {
           impact() %>%
             as_tibble(rownames = "sector") %>%
             pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
-            filter(expenditure > 0) %>%
+            filter(expenditure != 0) %>%
             ggplot(aes(x = as.factor(year), y = expenditure, fill = sector)) +
             geom_col() +
             theme_aiti() +
@@ -75,9 +75,9 @@ inputServer <- function(id, region, impact) {
 
       output$input_table_sector <- renderDataTable({
         impact() %>%
-          rbind(colSums(impact())) %>%
           as_tibble(rownames = "Industry Sector") %>%
-          filter(rowSums(across(where(is.double))) > 0) %>%
+          filter(rowSums(across(where(is.double))) != 0) %>%
+          adorn_totals() %>%
           datatable(rownames = FALSE)
       })
 
@@ -89,7 +89,6 @@ inputServer <- function(id, region, impact) {
       output$title2 <- renderUI({
         h1(glue("Direct Capital Expenditure ($M) by Industry in {region()}"), class = 'text-primary')
       })
-
       output$download_plot <- downloadHandler(
         filename = function() {
           paste0(input$filename, ".", input$filetype)

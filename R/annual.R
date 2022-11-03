@@ -38,9 +38,10 @@ AnnualServer <- function(id, tab, region, impact) {
       })
 
       output$year_radio <- renderUI({
-        validate(
-          need(sum(impact()) > 0, FALSE)
-        )
+
+        if (all(impact() == 0)) {
+          validate(FALSE)
+        }
         choices <- 2022:(2022 + ncol(impact()) - 1)
         radioButtons(inputId = session$ns("year_radio"),
                      label = NULL,
@@ -50,10 +51,12 @@ AnnualServer <- function(id, tab, region, impact) {
 
       output$annual_table <- renderDataTable({
 
-        validate(
-          need(sum(impact()) > 0, "Enter data in Project Setup > Data Input to calculate economic impacts. "),
-          need(input$year_radio, FALSE)
-        )
+        req(input$year_radio)
+
+
+        if (all(impact() == 0) && is.null(input$year_radio)) {
+          validate("Enter data in Project Setup > Data Input to calculate economic impacts. ")
+        }
 
         if (tab == "emp") {
           disp <- function(table) {
@@ -80,10 +83,12 @@ AnnualServer <- function(id, tab, region, impact) {
       })
 
       output$annual_plot <- renderPlot({
-        validate(
-          need(sum(impact()) > 0, FALSE),
-          need(input$year_radio, FALSE)
-        )
+
+        req(input$year_radio)
+
+        if (all(impact() == 0) && is.null(input$year_radio)) {
+          validate(FALSE)
+        }
 
         if (tab == "emp") {
           x_axis <- scale_x_continuous(labels = scales::comma_format())

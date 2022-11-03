@@ -143,36 +143,27 @@ function(input, output, session) {
   # Report ------------------------------------------------------------------
 
   output$report <- downloadHandler(
-    filename = "report.html",
+    filename = paste0(input$filename, ".pdf"),
     content = function(file) {
-      tempReport <- file.path(tempdir(), "report.Rmd")
-      file.copy("report.Rmd", tempReport, overwrite = TRUE)
+      tempReport <- file.path(tempdir(), c("report.Rmd", "preamble-latex.tex"))
+      file.copy("report.Rmd", tempReport[1], overwrite = TRUE)
+      file.copy("preamble-latex.tex", tempReport[2], overwrite = TRUE)
 
       params <- list(title = input$project_name,
                      description = input$project_desc,
                      author = input$project_analyst,
-                     data = input$industry_input)
+                     data = input$industry_input,
+                     region = input$lga,
+                     include_tables = input$report_tables,
+                     include_graphs = input$report_graphs)
 
-      rmarkdown::render(tempReport, output_file = file,
+      rmarkdown::render(tempReport[1],
+                        output_file = file,
                         params = params,
                         envir = new.env(parent = globalenv())
       )
     }
   )
-
-
-  # GRP ---------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
 
 
 
