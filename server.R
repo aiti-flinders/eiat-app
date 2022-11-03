@@ -145,23 +145,25 @@ function(input, output, session) {
   output$report <- downloadHandler(
     filename = paste0(input$filename, ".pdf"),
     content = function(file) {
-      tempReport <- file.path(tempdir(), c("report.Rmd", "preamble-latex.tex"))
-      file.copy("report.Rmd", tempReport[1], overwrite = TRUE)
-      file.copy("preamble-latex.tex", tempReport[2], overwrite = TRUE)
+      withProgress(message = "Rendering document, please wait!", {
+        tempReport <- file.path(tempdir(), c("report.Rmd", "preamble-latex.tex"))
+        file.copy("report.Rmd", tempReport[1], overwrite = TRUE)
+        file.copy("preamble-latex.tex", tempReport[2], overwrite = TRUE)
 
-      params <- list(title = input$project_name,
-                     description = input$project_desc,
-                     author = input$project_analyst,
-                     data = input$industry_input,
-                     region = input$lga,
-                     include_tables = input$report_tables,
-                     include_graphs = input$report_graphs)
+        params <- list(title = input$project_name,
+                       description = input$project_desc,
+                       author = input$project_analyst,
+                       data = input$industry_input,
+                       region = input$lga,
+                       include_tables = input$report_tables,
+                       include_graphs = input$report_graphs)
 
-      rmarkdown::render(tempReport[1],
-                        output_file = file,
-                        params = params,
-                        envir = new.env(parent = globalenv())
-      )
+        rmarkdown::render(tempReport[1],
+                          output_file = file,
+                          params = params,
+                          envir = new.env(parent = globalenv())
+        )
+      })
     }
   )
 
@@ -187,12 +189,12 @@ function(input, output, session) {
 
   regional_employment <- reactive({
     lq_models[[input$lga]][c("Local Employment", "Total Employment"),] %>%
-    as_tibble(rownames = "employment_type") %>%
-    pivot_longer(-employment_type,
-                 names_to = "Sector") %>%
-    pivot_wider(names_from = employment_type) %>%
-    mutate(across(where(is.double), round)) %>%
-    filter(Sector %in% eiat:::anzsic_swap$name)
+      as_tibble(rownames = "employment_type") %>%
+      pivot_longer(-employment_type,
+                   names_to = "Sector") %>%
+      pivot_wider(names_from = employment_type) %>%
+      mutate(across(where(is.double), round)) %>%
+      filter(Sector %in% eiat:::anzsic_swap$name)
   })
 
   output$regional_employment <- renderDataTable(
@@ -214,7 +216,7 @@ function(input, output, session) {
 
   output$multipliers <- renderDataTable(
     multipliers(input$region) %>%
-    datatable(rownames = TRUE) %>%
+      datatable(rownames = TRUE) %>%
       formatRound(columns = c(2:length(.)), digits = 3)
   )
 
