@@ -11,35 +11,35 @@ navbarPage("Economic Impact Assessment Tool",
                              p("EIAT is an online input-output (I-O) analysis tool for Local Goverment Areas across Australia.
                       It has been developed by the Australian Industrial Transformation Institute at Flinders University,
                       in conjunction with AURIN. This tool is designed to enable users to conduct regional economic impact analyses."),
-                             h1("Input-Output Models"),
-                             p("Input-Output models provide a standard approach for the estimation of the economic impact of a particular activity
+                      h1("Input-Output Models"),
+                      p("Input-Output models provide a standard approach for the estimation of the economic impact of a particular activity
                       (e.g. construction of a new infrastructure project). A regional economic impact statement regarding the impact of
                       major projects and policies has become a critical part of regional development analysis, and is an extensive component
                       of the applied economic literature. The linkages between employment opportunities and residents - and business to business linkages affect
                       urban design and transport systems, infrasftructure demand, and regional taxes, amongst others."),
-                             h1("Using the Economic Impact Analysis Tool"),
-                             tags$b("The quality of an economic impact assessment is dependent on the quality of input data.", style = 'color:red'),
-                             p("The analyst is required to enter the direct capital expenditures assosciated with the investment project of interest.
+                      h1("Using the Economic Impact Analysis Tool"),
+                      tags$b("The quality of an economic impact assessment is dependent on the quality of input data.", style = 'color:red'),
+                      p("The analyst is required to enter the direct capital expenditures assosciated with the investment project of interest.
                              These expenditures must be expressed in millions of dollars ($M) in basic or producer prices which exclude margins,
                              taxes, and subsidies. Only expenditure which is expected to occur inside the region should be entered. Expenditures that
                              occur outside of the region should be excluded from the analysis. This includes expenditure which may be allocated to a region but
                              must be imported from outside the region. The tool is agnostic to input data. Any reporting of potential economic impacts
                              should also include a summary of the data used to generate the impact."),
-                             p("For simple projects, the user may enter data directly into the Data Input panel in Project Setup. For more complex analyses,
+                      p("For simple projects, the user may enter data directly into the Data Input panel in Project Setup. For more complex analyses,
                              the user may download an excel template, enter the expenditure, and upload to the tool."),
-                             h1("Important Assumptions"),
-                             p("The use of an input-output model imposes a number of assumptions which must be considered in interpreting the predicted impacts.
+                      h1("Important Assumptions"),
+                      p("The use of an input-output model imposes a number of assumptions which must be considered in interpreting the predicted impacts.
                              They include:",
-                               tags$ol(
-                                 tags$li("Increases in demand in the region are serviced by industries with constant proportions, and no significant price adjustments occur."),
-                                 tags$li("Industries have a linear production function, which implies constant returns to scales and fixed input proportions."),
-                                 tags$li("Firms within a sector are homogenous, which implies they produce a fixed set of products that are not produced by any other sector,
+                        tags$ol(
+                          tags$li("Increases in demand in the region are serviced by industries with constant proportions, and no significant price adjustments occur."),
+                          tags$li("Industries have a linear production function, which implies constant returns to scales and fixed input proportions."),
+                          tags$li("Firms within a sector are homogenous, which implies they produce a fixed set of products that are not produced by any other sector,
                                        and that the input structure of the firms are the same."),
-                                 tags$li("The model is a static model that does not take into account the dynamic processes involved in the adjustment to an external change.")
-                               )
-                             ),
-                             h1("Required Information"),
-                             p("Before using input-output analysis to estimate the economic impact of regional expenditure, the user is required to collect information.
+                          tags$li("The model is a static model that does not take into account the dynamic processes involved in the adjustment to an external change.")
+                        )
+                      ),
+                      h1("Required Information"),
+                      p("Before using input-output analysis to estimate the economic impact of regional expenditure, the user is required to collect information.
                              The analyst must know the magnitude of various expenditures and where they occur. Also needed is information on how the sectors recieving this
                              expenditure share their expenditures among the various sectors from whom they buy, and so on, for the further expenditure rounds. While private
                              and public stakeholders are welcome to use this powerful tool to conduct input-output analysis, it is recommended that expert consultants are
@@ -81,6 +81,12 @@ navbarPage("Economic Impact Assessment Tool",
                                  Sheets. You may give the file any name which you prefer, but the extension should remain 'Comma Separated Values (.csv)'.
                                  Data created using the template can then be uploaded, using the upload data button.",
                                  "Please check that the data has been enterered correctly before proceeding."),
+                               splitLayout(
+                                 downloadButton("download", "Download Excel Template", style = 'margin-top:25px'),
+                                 fileInput("upload", "Upload Data", accept = "csv"),
+                                 actionButton("clear", "Clear ALL Entered Data")
+
+                               ),
                                matrixInput("industry_input",
                                            class = "numeric",
                                            cols = list(
@@ -98,18 +104,8 @@ navbarPage("Economic Impact Assessment Tool",
                                              delete = FALSE
                                            ),
                                            value = matrix(0, nrow = 19, ncol = 1, dimnames = list(eiat:::anzsic_swap$name, 2022))
-                               ),
-                               splitLayout(
-                                 downloadButton("download", "Download Excel Template", style = 'margin-top:25px'),
-                                 fileInput("upload", "Upload Data", accept = "csv"),
-                                 actionButton("clear", "Clear ALL Entered Data")
-
                                )
-
-
-
                       )
-
                     )
 
            ),
@@ -198,7 +194,7 @@ navbarPage("Economic Impact Assessment Tool",
                       ),
                       column(width = 12,
                              downloadButton("report", "Generate Report")
-                    )
+                      )
                     )
 
            )
