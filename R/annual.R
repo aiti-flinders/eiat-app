@@ -5,8 +5,9 @@ AnnualUI <- function(id) {
   tabPanel("Annual Impacts",
            uiOutput(ns("year_radio")),
            uiOutput(ns("title")),
+           tags$style("#DT1 td {padding:0}"),
            dataTableOutput(ns("annual_table")),
-           plotOutput(ns("annual_plot"))
+           plotOutput(height = '400px',ns("annual_plot"))
   )
 
 }
@@ -91,22 +92,31 @@ AnnualServer <- function(id, tab, region, impact) {
         }
 
         if (tab == "emp") {
-          x_axis <- scale_x_continuous(labels = scales::comma_format())
+          x_axis <- scale_x_continuous(labels = scales::comma_format(),
+                                       expand = expansion(mult = c(0, 0.1)))
           title <-  glue("Employment Impacts by Industry (FTE) in {region()}: {input$year_radio}")
+          fct_lvls <- c("Flow on Employment", "Direct Employment")
+
         } else {
-          x_axis <- scale_x_continuous(labels = scales::dollar_format(suffix = "M"))
-          title <- glue("Gross Regional Product Impacts by Industry ($M) in {region()}: {input$year_radio}")
+          x_axis <- scale_x_continuous(labels = scales::dollar_format(suffix = "M"),
+                                       expand = expansion(mult = c(0, 0.1)))
+          title <- glue("Gross Regional Product Impacts by Industry ($M): {region()} {input$year_radio}")
+          fct_lvls <- c("Flow on GRP", "Direct GRP")
         }
 
         impact_data() %>%
           filter(grepl("Direct|Flow on", type),
                  year == input$year_radio)  %>%
+          mutate(type = factor(type, levels = fct_lvls)) %>%
           ggplot(aes(x = value, y = reorder(Sector, value))) +
           geom_col(aes(fill = type)) +
           labs(x = NULL,
+               y = NULL,
                title = title) +
           x_axis +
-          theme_aiti(flipped = TRUE)
+          theme_aiti(colour = "grey",
+                     flipped = TRUE) +
+          scale_fill_aiti()
 
 
       })

@@ -39,8 +39,8 @@ inputServer <- function(id, region, impact) {
             theme_aiti() +
             labs(x = NULL,
                  y = NULL,
-                 title = glue("Direct Capital Expenditure ($M) by Year in {region()}")) +
-            scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
+                 title = glue("Direct Capital Expenditure ($M): {region()}")) +
+            scale_y_continuous(labels = scales::dollar_format(suffix = "M", scale = 0.1))
         } else {
           impact() %>%
             as_tibble(rownames = "sector") %>%
