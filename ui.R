@@ -2,7 +2,6 @@
 
 navbarPage("Economic Impact Assessment Tool",
            fluid = TRUE,
-           theme = bslib::bs_theme(bootswatch = "zephyr", version = 5),
            tabPanel("Description",
                     fluidRow(
                       column(width = 7, id = "grey",
@@ -83,7 +82,7 @@ navbarPage("Economic Impact Assessment Tool",
                                  "Please check that the data has been enterered correctly before proceeding."),
                                splitLayout(
                                  downloadButton("download", "Download Excel Template", style = 'margin-top:25px'),
-                                 fileInput("upload", "Upload Data", accept = "csv"),
+                                 fileInput("upload", "Upload Data", accept = ".csv"),
                                  actionButton("clear", "Clear ALL Entered Data")
 
                                ),
