@@ -9,12 +9,15 @@ function(input, output, session) {
   # File Upload -------------------------------------------------------------
 
   user_matrix <- reactive({
+
     req(input$upload)
 
     ext <- tools::file_ext(input$upload$name)
 
-    uploaded_file <- vroom::vroom(input$upload$datapath,
-                                  delim = ",")
+    uploaded_file <- switch(ext,
+           csv = vroom::vroom(input$upload$datapath, delim = ","),
+           validate("Invalid file; Please upload a .csv file.")
+    )
 
     uploaded_data <- uploaded_file %>%
       select(where(is.double)) %>%
