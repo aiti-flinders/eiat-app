@@ -5,14 +5,11 @@ library(tidyr)
 library(shinyMatrix)
 library(ggplot2)
 library(aititheme)
-library(thematic)
+library(bslib)
 library(glue)
 library(janitor)
 
 regions <- eiat:::get_available_regions(2021)
-
-ggplot2::theme_set(aititheme::theme_aiti())
-thematic::thematic_shiny()
 
 download_graph_ui <- function(id) {
   fluidRow(
@@ -48,3 +45,4 @@ download_graph_ui <- function(id) {
     )
   )
 }
+
