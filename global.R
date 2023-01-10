@@ -11,6 +11,30 @@ library(janitor)
 
 regions <- eiat:::get_available_regions(2021)
 
+description_table <- tags$table(
+  tags$tr(
+    tags$th("Data"),
+    tags$th("Version"),
+    tags$th("Last Updated")
+  ),
+  tags$tr(
+    tags$td("Employment by Industry"),
+    tags$td("2021 Census"),
+    tags$td("3 October 2022")
+  ),
+  tags$tr(
+    tags$td("National Input-Output Table"),
+    tags$td("2019-20 financial year"),
+    tags$td("27 June 2022")
+  ),
+  tags$tr(
+    tags$td("Regional Input-Output Table"),
+    tags$td(as.character(packageVersion('eiat'))),
+    tags$td("")
+  )
+
+)
+
 download_graph_ui <- function(id) {
   fluidRow(
     column(width = 6,
