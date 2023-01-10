@@ -55,9 +55,10 @@ function(input, output, session) {
   )
 
   # Objects
-  downloadServer("download_national_io", "National I-O (19 Sector).csv", national_19)
+  downloadServer("download_national_io", "National I-O (19 Sector) Table.csv", national_19)
+  downloadServer("download_regional_io", "Regional I-O (19 Sector) Table.csv", as_tibble(lq_models[[input$lga]], rownames = "Sector"))
   downloadServer("download_regional_employment", "Regional Employment.csv", regional_employment())
-  downloadServer("download_expenditure", "Expenditure Plot.png", )
+  downloadServer("download_expenditure", "Expenditure Plot.png")
 
 
   # Matrix ------------------------------------------------------------------
@@ -206,6 +207,10 @@ function(input, output, session) {
 
 
   )
+
+  output$regional_base_table <- renderUI({
+    h3(glue("Regional Employment (FTE) in {region_selected()}"))
+  })
 
 
   output$regional_io <- renderDataTable(

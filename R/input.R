@@ -5,6 +5,7 @@ inputUI <- function(id) {
     tabPanel("Summary Tables",
              uiOutput(ns("title1")),
              dataTableOutput(ns("input_table")),
+             downloadUI("input_table_download", button_text = "Download Input Data"),
              uiOutput(ns('title2')),
              dataTableOutput(ns("input_table_sector"))
     ),
@@ -36,7 +37,7 @@ inputServer <- function(id, region, impact) {
             summarise(expenditure = sum(expenditure), .groups = "drop") %>%
             ggplot(aes(x = as.factor(year), y = expenditure)) +
             geom_col() +
-            theme_aiti() +
+            theme_aiti(flipped = TRUE) +
             labs(x = NULL,
                  y = NULL,
                  title = glue("Direct Capital Expenditure ($M): {region()}")) +
@@ -48,7 +49,7 @@ inputServer <- function(id, region, impact) {
             filter(expenditure != 0) %>%
             ggplot(aes(x = as.factor(year), y = expenditure, fill = sector)) +
             geom_col() +
-            theme_aiti() +
+            theme_aiti(flipped = TRUE) +
             labs(x = NULL,
                  y = NULL,
                  title = glue("Direct Capital Expenditure ($M) by Industry in {region()}")) +
@@ -57,6 +58,7 @@ inputServer <- function(id, region, impact) {
 
         }
       })
+
 
 
       output$plot <- renderPlot({
@@ -84,21 +86,22 @@ inputServer <- function(id, region, impact) {
 
 
       output$title1 <- renderUI({
-        h1(glue("Direct Capital Expenditure ($M) in {region()}"), class = 'text-primary')
+        h1(glue("Direct Capital Expenditure ($M) in {region()}"))
       })
       output$title2 <- renderUI({
-        h1(glue("Direct Capital Expenditure ($M) by Industry in {region()}"), class = 'text-primary')
+        h1(glue("Direct Capital Expenditure ($M) by Industry in {region()}"))
       })
       output$download_plot <- downloadHandler(
         filename = function() {
           paste0(input$filename, ".", input$filetype)
         },
         content = function(file) {
-          thematic_save_plot(create_plot(),
-                             device = default_device(input$filetype),
-                             filename = file,
-                             width = input$width,
-                             height = input$height)
+          ggsave(create_plot(),
+                 device = input$filetype,
+                 units = "cm",
+                 filename = file,
+                 width = input$width * 2.54 / 300,
+                 height = input$height * 2.54 / 300)
         }
 
 
