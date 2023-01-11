@@ -29,7 +29,7 @@ function(input, output, session) {
                 nrow = 19,
                 ncol = n_col,
                 dimnames = list(eiat:::anzsic_swap$name,
-                                2022:(2022 + n_col - 1)))
+                                2023:(2023 + n_col - 1)))
 
     m
 
@@ -59,7 +59,6 @@ function(input, output, session) {
   downloadServer("download_regional_io", "Regional I-O (19 Sector) Table.csv", as_tibble(lq_models[[input$lga]], rownames = "Sector"))
   downloadServer("download_regional_employment", "Regional Employment.csv", regional_employment())
   downloadServer("download_expenditure", "Expenditure Plot.png")
-
 
   # Matrix ------------------------------------------------------------------
 
@@ -139,15 +138,21 @@ function(input, output, session) {
 
   # Modules --------------------------------------------------------------
   AnnualServer("employment", tab = "emp", reactive(input$lga), reactive(input$industry_input))
+  AnnualGraphServer("employment_graph", tab = "emp", reactive(input$lga), reactive(input$industry_input))
   AnnualServer("grp", tab = "grp", reactive(input$lga), reactive(input$industry_input))
+  AnnualGraphServer("grp_graph", tab = "grp", reactive(input$lga), reactive(input$industry_input))
   TotalServer("employment_total", tab = "emp", reactive(input$lga), reactive(input$industry_input))
+  TotalGraphServer("employment_total_graph", tab = "emp", reactive(input$lga), reactive(input$industry_input))
   TotalServer("grp_total", tab = "grp", reactive(input$lga), reactive(input$industry_input))
+  TotalGraphServer("grp_total_graph", tab = "grp", reactive(input$lga), reactive(input$industry_input))
 
 
   # Report ------------------------------------------------------------------
 
   output$report <- downloadHandler(
-    filename = paste0(input$filename, ".pdf"),
+    filename = function() {
+      paste0(input$filename, ".pdf")
+    },
     content = function(file) {
       withProgress(message = "Rendering document, please wait!", {
         tempReport <- file.path(tempdir(), c("report.Rmd", "preamble-latex.tex"))
@@ -164,6 +169,7 @@ function(input, output, session) {
 
         rmarkdown::render(tempReport[1],
                           output_file = file,
+                          output_format = input$report_format,
                           params = params,
                           envir = new.env(parent = globalenv())
         )

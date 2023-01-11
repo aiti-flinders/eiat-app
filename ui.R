@@ -16,7 +16,7 @@ navbarPage("Economic Impact Assessment Tool",
                       (e.g. construction of a new infrastructure project). A regional economic impact statement regarding the impact of
                       major projects and policies has become a critical part of regional development analysis, and is an extensive component
                       of the applied economic literature. The linkages between employment opportunities and residents - and business to business linkages affect
-                      urban design and transport systems, infrasftructure demand, and regional taxes, amongst others."),
+                      urban design and transport systems, infrastructure demand, and regional taxes, amongst others."),
                       h2("Data Summary"),
                       p("This tool draws on data from the following sources."),
                       p(tags$b("Employment by industry: "),"2021 Census, last updated 3 October 2022"),
@@ -110,12 +110,12 @@ navbarPage("Economic Impact Assessment Tool",
                                              delta = 0,
                                              delete = FALSE
                                            ),
-                                           value = matrix(0, nrow = 19, ncol = 1, dimnames = list(eiat:::anzsic_swap$name, 2022))
+                                           value = matrix(0, nrow = 19, ncol = 1, dimnames = list(eiat:::anzsic_swap$name, 2023))
                                ),
                                splitLayout(
                                  downloadButton("download", "Download Excel Template", style = 'margin-top:25px'),
                                  fileInput("upload", "Upload Data", accept = ".csv")
-                                 ),
+                               ),
                                p("For more complicated analyses, you may wish to tabulate the input price data offline.
                                  The 'Download Excel Template' button will download a file called 'EIAT-Template.csv' based
                                  on the parameters set above. This file can be opened in Microsoft Excel, OpenOffice, or Google Sheets.
@@ -138,13 +138,17 @@ navbarPage("Economic Impact Assessment Tool",
                       tabPanel("Employment Impacts",
                                tabsetPanel(
                                  AnnualUI("employment"),
-                                 TotalUI("employment_total")
+                                 AnnualGraphUI("employment_graph"),
+                                 TotalUI("employment_total"),
+                                 TotalGraphUI("employment_total_graph")
                                )
                       ),
                       tabPanel("Gross Regional Product Impacts",
                                tabsetPanel(
                                  AnnualUI("grp"),
-                                 TotalUI("grp_total")
+                                 AnnualGraphUI("grp_graph"),
+                                 TotalUI("grp_total"),
+                                 TotalGraphUI("grp_total_graph")
                                )
                       )
            ),
@@ -183,8 +187,7 @@ navbarPage("Economic Impact Assessment Tool",
            ),
            tabPanel("Report",
                     h3("Project Details"),
-                    p("You may generate and download a report summarising your economic impact assessment. This report can be downloaded as either
-                      a .pdf or word document"),
+                    p("You may generate and download a report summarising your economic impact assessment."),
                     fluidRow(
                       column(width = 4,
                              textInput("project_name", "Project Name: ", placeholder = "Enter Project Name")
