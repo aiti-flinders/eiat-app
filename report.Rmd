@@ -129,7 +129,7 @@ params$data %>%
   filter(expenditure != 0) %>%
   ggplot(aes(x = as.factor(year), y = expenditure, fill = sector)) +
   geom_col() +
-  theme_aiti() +
+  theme_aiti(colour = "grey") +
   labs(x = NULL,
        y = NULL, 
        title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
