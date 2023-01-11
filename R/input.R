@@ -5,9 +5,8 @@ inputUI <- function(id) {
     tabPanel("Summary Tables",
              uiOutput(ns("title1")),
              dataTableOutput(ns("input_table")),
-             downloadUI("input_table_download", button_text = "Download Input Data"),
              uiOutput(ns('title2')),
-             dataTableOutput(ns("input_table_sector"))
+             dataTableOutput(ns("input_table_sector")),
     ),
     tabPanel("Summary Graphs",
              selectInput(ns("input_type"),
@@ -37,7 +36,7 @@ inputServer <- function(id, region, impact) {
             summarise(expenditure = sum(expenditure), .groups = "drop") %>%
             ggplot(aes(x = as.factor(year), y = expenditure)) +
             geom_col() +
-            theme_aiti(flipped = TRUE) +
+            theme_aiti(flipped = FALSE) +
             labs(x = NULL,
                  y = NULL,
                  title = glue("Direct Capital Expenditure ($M): {region()}")) +
@@ -49,7 +48,7 @@ inputServer <- function(id, region, impact) {
             filter(expenditure != 0) %>%
             ggplot(aes(x = as.factor(year), y = expenditure, fill = sector)) +
             geom_col() +
-            theme_aiti(flipped = TRUE) +
+            theme_aiti(flipped = FALSE) +
             labs(x = NULL,
                  y = NULL,
                  title = glue("Direct Capital Expenditure ($M) by Industry in {region()}")) +
@@ -65,13 +64,35 @@ inputServer <- function(id, region, impact) {
         create_plot()
       })
 
+      output$download_plot <- downloadHandler(
+        filename = function() {
+
+          fname <- ifelse(is.null(input$filename), "eiat-download", input$filename)
+
+          paste0(fname, ".", input$filetype)
+        },
+        content = function(file)
+          ggsave(filename = file,
+                 plot = create_plot() + labs(caption = paste0("Produced with EIAT Version: ", as.character(packageVersion("eiat")))),
+                 dpi = "screen",
+                 device = input$filetype,
+                 units = "px",
+                 width = input$width,
+                 height = input$height)
+      )
+
+
+
       output$input_table <- renderDataTable({
         impact() %>%
           as_tibble(rownames = "sector") %>%
           summarise(across(where(is.double), sum)) %>%
           mutate(Region = region(),
                  .before = 1) %>%
-          datatable(rownames = FALSE)
+          datatable(rownames = FALSE,
+                    extensions = "Buttons",
+                    options = list(dom = "Bt",
+                                   buttons = c("copy", "csv", "excel", "pdf", "print")))
       })
 
 
@@ -80,7 +101,10 @@ inputServer <- function(id, region, impact) {
           as_tibble(rownames = "Industry Sector") %>%
           filter(rowSums(across(where(is.double))) != 0) %>%
           adorn_totals() %>%
-          datatable(rownames = FALSE)
+         datatable(rownames = FALSE,
+                   extensions = "Buttons",
+                   options = list(dom = "Bt",
+                                  buttons = c("copy", "csv", "excel", "pdf", "print")))
       })
 
 
@@ -91,21 +115,9 @@ inputServer <- function(id, region, impact) {
       output$title2 <- renderUI({
         h1(glue("Direct Capital Expenditure ($M) by Industry in {region()}"))
       })
-      output$download_plot <- downloadHandler(
-        filename = function() {
-          paste0(input$filename, ".", input$filetype)
-        },
-        content = function(file) {
-          ggsave(create_plot(),
-                 device = input$filetype,
-                 units = "cm",
-                 filename = file,
-                 width = input$width * 2.54 / 300,
-                 height = input$height * 2.54 / 300)
-        }
 
+      downloadServer("download_input_industry_table", "Input Table (Industry).csv", input_table_sector())
 
-      )
     }
   )
 }
