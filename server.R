@@ -48,7 +48,7 @@ function(input, output, session) {
       "EIAT-Template.csv"
     },
     content = function(file) {
-      out <- matrix(0, nrow = 19, ncol = input$years, dimnames = list(eiat:::anzsic_swap$name, 2022:(2022 + input$years - 1)))
+      out <- matrix(0, nrow = 19, ncol = input$years, dimnames = list(eiat:::anzsic_swap$name, 2023:(2023 + input$years - 1)))
       out <- as_tibble(out, rownames = "Sector")
       vroom::vroom_write(out, file, delim = ",")
     }
@@ -105,7 +105,7 @@ function(input, output, session) {
 
   observeEvent(input$clear, {
 
-    col_names <- 2022:(2022 + input$years - 1)
+    col_names <- 2023:(2023 + input$years - 1)
 
     m <- matrix(0, nrow = 19, ncol = input$years, dimnames = list(eiat:::anzsic_swap$name, col_names))
     updateMatrixInput(session, "industry_input", m)
