@@ -2,12 +2,10 @@ AnnualUI <- function(id) {
 
   ns <- NS(id)
 
-  tabPanel("Annual Impacts",
-           uiOutput(ns("year_radio")),
+  tabPanel("Annual Impact Results",
            uiOutput(ns("title")),
-           tags$style("#DT1 td {padding:0}"),
+           uiOutput(ns("year_radio")),
            dataTableOutput(ns("annual_table")),
-           plotOutput(height = '400px',ns("annual_plot"))
   )
 
 }
@@ -28,12 +26,17 @@ AnnualServer <- function(id, tab, region, impact) {
 
       output$title <- renderUI({
 
-        req(input$year_radio)
+        if (is.null(input$year_radio)) {
+          switch(tab,
+                 "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}")),
+                 "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}")))
+
+        } else {
 
         switch(tab,
                "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}: {input$year_radio}")),
-               "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}: {input$year_radio}"))
-        )
+               "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}: {input$year_radio}")))
+        }
 
 
       })
@@ -41,9 +44,9 @@ AnnualServer <- function(id, tab, region, impact) {
       output$year_radio <- renderUI({
 
         if (all(impact() == 0)) {
-          validate(FALSE)
+          validate("Enter data in Project Setup to calculate economic impacts.")
         }
-        choices <- 2022:(2022 + ncol(impact()) - 1)
+        choices <- 2023:(2023 + ncol(impact()) - 1)
         radioButtons(inputId = session$ns("year_radio"),
                      label = NULL,
                      choices = choices,
@@ -55,8 +58,8 @@ AnnualServer <- function(id, tab, region, impact) {
         req(input$year_radio)
 
 
-        if (all(impact() == 0) && is.null(input$year_radio)) {
-          validate("Enter data in Project Setup > Data Input to calculate economic impacts. ")
+        if (all(impact() == 0)) {
+          validate("Enter data in Project Setup to calculate economic impacts. ")
         }
 
         if (tab == "emp") {
@@ -79,17 +82,75 @@ AnnualServer <- function(id, tab, region, impact) {
                                     "Total"))) %>%
           janitor::adorn_totals() %>%
           datatable(colnames = c("Sector", "Direct", "Flow-on", "Total"),
-                    rownames = FALSE) %>%
+                    rownames = FALSE,
+                    extensions = "Buttons",
+                    options = list(dom = "Bt",
+                                   buttons = c("copy", "csv", "excel", "pdf", "print"))) %>%
           disp()
       })
 
-      output$annual_plot <- renderPlot({
 
-        req(input$year_radio)
 
-        if (all(impact() == 0) && is.null(input$year_radio)) {
+
+    }
+  )
+}
+
+AnnualGraphUI <- function(id) {
+  ns <- NS(id)
+
+  tabPanel("Annual Impact Graphs",
+           uiOutput(ns("title")),
+           uiOutput(ns("year_radio")),
+           plotOutput(height = '500px',ns("annual_plot")),
+           download_graph_ui(id)
+  )
+
+}
+
+AnnualGraphServer <- function(id, tab, region, impact) {
+
+  moduleServer(
+    id,
+    function(input, output, session)  {
+
+      impact_data <- reactive({
+        impact_analysis(region = region(),
+                        impacts = impact()) %>%
+          .[[tab]]
+      })
+
+      output$title <- renderUI({
+
+        if (is.null(input$year_radio)) {
+
+          switch(tab,
+                 "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}")),
+                 "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}")))
+
+        } else {
+
+        switch(tab,
+               "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}: {input$year_radio}")),
+               "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}: {input$year_radio}")))
+        }
+
+
+      })
+
+      output$year_radio <- renderUI({
+
+        if (all(impact() == 0)) {
           validate(FALSE)
         }
+        choices <- 2023:(2023 + ncol(impact()) - 1)
+        radioButtons(inputId = session$ns("year_radio"),
+                     label = NULL,
+                     choices = choices,
+                     inline = TRUE)
+      })
+
+      create_plot <- reactive({
 
         if (tab == "emp") {
           x_axis <- scale_x_continuous(labels = scales::comma_format(),
@@ -117,11 +178,37 @@ AnnualServer <- function(id, tab, region, impact) {
           theme_aiti(colour = "grey",
                      flipped = TRUE) +
           scale_fill_aiti()
+      })
+
+      output$annual_plot <- renderPlot({
+
+        if (all(impact() == 0)) {
+          validate("Enter data in Project Setup to calculate economic impacts.")
+        }
+
+        create_plot()
+
+
 
 
       })
 
+      output$download_plot <- downloadHandler(
+        filename = function() {
 
+          fname <- ifelse(is.null(input$filename), "eiat-download", input$filename)
+
+          paste0(fname, ".", input$filetype)
+        },
+        content = function(file)
+          ggsave(filename = file,
+                 plot = create_plot() + labs(caption = paste0("Produced with EIAT Version: ", as.character(packageVersion("eiat")))),
+                 dpi = "screen",
+                 device = input$filetype,
+                 units = "px",
+                 width = input$width,
+                 height = input$height)
+      )
     }
   )
 }
