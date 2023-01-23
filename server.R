@@ -15,24 +15,77 @@ function(input, output, session) {
     ext <- tools::file_ext(input$upload$name)
 
     uploaded_file <- switch(ext,
-           csv = vroom::vroom(input$upload$datapath, delim = ","),
-           validate("Invalid file; Please upload a .csv file.")
+                            csv = try(vroom::vroom(input$upload$datapath, delim = ",")),
+                            validate("Invalid file; Please upload a .csv file.")
     )
 
-    uploaded_data <- uploaded_file %>%
-      select(where(is.double)) %>%
-      mutate(across(where(is.double), ~ifelse(is.na(.x), 0, .x)))
+    intended_cols <- "Sector|2023|2024|2025|2026|2027|2028|2029|2030|2031|2032|2033"
 
-    n_col <- ncol(uploaded_data)
 
-    m <- matrix(sapply(uploaded_data, cbind, simplify = TRUE),
-                nrow = 19,
-                ncol = n_col,
-                dimnames = list(eiat:::anzsic_swap$name,
-                                2023:(2023 + n_col - 1)))
+    if (any(class(uploaded_file) == "try-error")) {
+      reset <- TRUE
+      cols <- TRUE
+    } else {
 
-    m
+      uploaded_data <- uploaded_file %>%
+        select(where(is.double)) %>%
+        mutate(across(where(is.double), ~ifelse(is.na(.x), 0, .x)))
 
+      cn <- colnames(uploaded_data)
+      cols <- grepl(intended_cols, cn)
+            reset <- FALSE
+
+    }
+
+
+
+
+    if (any(!cols)) {
+      showModal(modalDialog(
+        title = "Warning",
+        "Unexpected columns identified in uploaded data.
+        Input data may not be accurate.
+        Please validate before continuing, or use the Excel Template."
+      ))
+
+      n_col <- ncol(uploaded_data)
+
+      m <- matrix(sapply(uploaded_data, cbind, simplify = TRUE),
+                  nrow = 19,
+                  ncol = n_col,
+                  dimnames = list(eiat:::anzsic_swap$name,
+                                  2023:(2023 + n_col - 1)))
+
+      m
+    } else if (reset) {
+
+      showModal(modalDialog(
+        title = "Error",
+        "The uploaded file could not be opened.
+        Please check the file for any errors, or use the Excel Template.
+        No data has been entered."
+      ))
+
+      m <- matrix(0,
+                  nrow = 19,
+                  ncol = 1,
+                  dimnames = list(eiat:::anzsic_swap$name,
+                                  2023))
+
+      m
+
+    } else {
+
+      n_col <- ncol(uploaded_data)
+
+      m <- matrix(sapply(uploaded_data, cbind, simplify = TRUE),
+                  nrow = 19,
+                  ncol = n_col,
+                  dimnames = list(eiat:::anzsic_swap$name,
+                                  2023:(2023 + n_col - 1)))
+
+      m
+    }
 
   })
 
@@ -131,8 +184,12 @@ function(input, output, session) {
         sort()
     }
     still_selected <- isolate(input$lga[input$lga %in% lga])
-    updateSelectInput(session, "lga", choices = lga, selected = still_selected)
+    updateSelectInput(session, "lga", choices = lga, selected = first(lga))
   })
+
+
+
+
 
 
 
