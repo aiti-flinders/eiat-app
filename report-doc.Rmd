@@ -190,7 +190,7 @@ if (shiny::isRunning()) {setProgress(0.6)}
 ```
 
 ```{r tab.id = "emp-total-table", tab.cap = "Estimated Total employment impacts by industry by year", include = "Total employment impacts" %in% params$include_tables, results = 'asis'}
-cat("Table @ref(tab:emp-total-table) sumamries the esimtated *Total Employment* impacts induced by the change in final demand associated with this project. Total employment is the sum of direct and flow-on employment.\n\n")
+cat("Table \\@ref(tab:emp-total-table) sumamries the esimtated *Total Employment* impacts induced by the change in final demand associated with this project. Total employment is the sum of direct and flow-on employment.\n\n")
 
 data[["emp"]] %>% 
   filter(type == "Total Employment") %>%
@@ -205,7 +205,7 @@ if (shiny::isRunning()) {setProgress(0.7)}
 ```
 
 ```{r tab.id = 'emp-total-total-table', tab.cap = "Estimated employment impacts by year", include = "Summary employment impacts" %in% params$include_tables, results = 'asis'}
-cat("Table @ref(tab:emp-total-total-table) summarises the Direct, Flow-on, and Total employment impacts across each year of direct final expenditure impacts\n\n")
+cat("Table \\@ref(tab:emp-total-total-table) summarises the Direct, Flow-on, and Total employment impacts across each year of direct final expenditure impacts\n\n")
 
 data[["emp"]] %>% 
   filter(grepl("Direct|Flow on|Total", type)) %>%
@@ -229,7 +229,7 @@ This project is estimated to generate `r round(sum(data[["grp"]]$value))` millio
 
 ```{r fig.id = 'grp', fig.cap = "Gross Regional Product Impacts", results = 'asis', include = "GRP impacts" %in% params$include_graphs}
 
-cat("Figure @ref(fig:grp) shows the GRP impacts of this project over time.\n\n")
+cat("Figure \\@ref(fig:grp) shows the GRP impacts of this project over time.\n\n")
 
 impact_plot(data, type = params$plot_type, indicator = "grp")
 
@@ -238,7 +238,7 @@ if (shiny::isRunning()) {setProgress(0.9)}
 
 ```{r tab.id = 'grp-direct-table', tab.cap = "Estimated Direct GRP impacts by industry by year", include = "Direct GRP impacts" %in% params$include_tables, results = 'asis'}
 
-cat("Table @ref(tab:grp-direct-table) summarises the estimated *Direct GRP* impacts induced by the change in final demand associated with this project. Direct impacts are those which occur only as a result of the increased demand in each sector. \n\n")
+cat("Table \\@ref(tab:grp-direct-table) summarises the estimated *Direct GRP* impacts induced by the change in final demand associated with this project. Direct impacts are those which occur only as a result of the increased demand in each sector. \n\n")
 
 data[["grp"]] %>% 
   filter(type == "Direct GRP") %>%
@@ -254,7 +254,7 @@ data[["grp"]] %>%
 ```
 
 ```{r tab.id = 'grp-flow-on-table', tab.cap = "Estimated Flow on GRP impacts by industry by year", include = "Flow-on GRP impacts" %in% params$include_tables, results = 'asis'}
-cat("Table @ref(tab:grp-flow-on-table) summarises the estimated *Flow on GRP* impacts induced by the change in final demand associated with this project. Flow on impacts are those which occur through industrial linkages between different sectors of the economy. \n\n")
+cat("Table \\@ref(tab:grp-flow-on-table) summarises the estimated *Flow on GRP* impacts induced by the change in final demand associated with this project. Flow on impacts are those which occur through industrial linkages between different sectors of the economy. \n\n")
 
 data[["grp"]] %>% 
   filter(type == "Flow on GRP") %>%
@@ -268,7 +268,7 @@ data[["grp"]] %>%
 ```
 
 ```{r tab.id = 'grp-total-table', tab.cap = "Estimated Total GRP impacts by industry by year", include = "Total GRP impacts" %in% params$include_tables, results = 'asis'}
-cat("Table @ref(tab:grp-total-table) sumamries the esimtated *Total GRP* impacts induced by the change in final demand associated with this project. Total GRP is the sum of direct and flow-on GRP\n\n")
+cat("Table \\@ref(tab:grp-total-table) sumamries the esimtated *Total GRP* impacts induced by the change in final demand associated with this project. Total GRP is the sum of direct and flow-on GRP\n\n")
 
 data[["grp"]] %>% 
   filter(type == "Total GRP") %>%
@@ -282,7 +282,7 @@ data[["grp"]] %>%
 ```
 
 ```{r tab.id= 'grp-total-total-table', tab.cap = "Estimated GRP impacts by year", include = "Summary GRP impacts" %in% params$include_tables, results = 'asis'}
-cat("Table @ref(tab:grp-total-total-table) summarises the Direct, Flow-on, and Total GRP impacts across each year of direct final expenditure impacts\n\n")
+cat("Table \\@ref(tab:grp-total-total-table) summarises the Direct, Flow-on, and Total GRP impacts across each year of direct final expenditure impacts\n\n")
 
 data[["grp"]] %>% 
   filter(grepl("Direct|Flow on|Total", type)) %>%
