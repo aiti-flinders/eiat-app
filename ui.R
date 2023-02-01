@@ -122,6 +122,7 @@ navbarPage("Economic Impact Assessment Tool",
                                  You may rename the file if you wish, but the extension", tags$b("MUST"), "remain .csv. Once
                                  the data has been entered into the template, it can then be uploaded using the 'Upload Data' button.
                                  Please ensure that the data populated into the app is correct before you proceed."),
+                               p(tags$b("There is no guarantee that data prepared without using the Excel Template will upload correctly!")),
                                p("If you have made a mistake, or would like to start again, clicking the button below will reset all
                                  values to 0."),
                                actionButton("clear", "Clear ALL Entered Data")
@@ -159,7 +160,7 @@ navbarPage("Economic Impact Assessment Tool",
                                p("I-O tables are a means of presenting a detailed analysis of production and the use of products (goods and
                                  services) and the income generated in the production process for a particular period, usually one year.
                                  They show produts produced by each industry and how they are used by other industries and final users.
-                                 The tables are based on the principle that the value of hte output of each industry can be expressed as the sum
+                                 The tables are based on the principle that the value of the output of each industry can be expressed as the sum
                                  of the values of all the inputs to that industry plus any profits made. All of the products produced by
                                  each industry are identified as being used as inputs by other industries in their production process, being sold
                                  to final users of the products or contributing to the change in inventories."),
@@ -203,7 +204,12 @@ navbarPage("Economic Impact Assessment Tool",
                     h3("Download Report"),
                     fluidRow(
                       column(width = 4,
-                             textInput("filename", "Filename", placeholder = "Filename")
+                             fluidRow(style = "margin-right:0px; margin-left:0px",
+                             textInput("filename", "Filename", placeholder = "Filename"),
+                             radioButtons("report_format", "Report Format",
+                                          choiceNames = c("PDF", "Word Document"),
+                                          choiceValues = c(".pdf", ".docx"))
+                             )
                       ),
                       column(width = 4,
                              checkboxGroupInput(inputId = "report_tables",

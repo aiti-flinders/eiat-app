@@ -208,13 +208,19 @@ function(input, output, session) {
 
   output$report <- downloadHandler(
     filename = function() {
-      paste0(input$filename, ".pdf")
+      paste0(input$filename, input$report_format)
     },
     content = function(file) {
       withProgress(message = "Rendering document, please wait!", {
-        tempReport <- file.path(tempdir(), c("report.Rmd", "preamble-latex.tex"))
-        file.copy("report.Rmd", tempReport[1], overwrite = TRUE)
-        file.copy("preamble-latex.tex", tempReport[2], overwrite = TRUE)
+        tempReport <- file.path(tempdir(), c("report.Rmd", "report-doc.Rmd", "preamble-latex.tex"))
+
+        if (input$report_format == ".pdf") {
+          file.copy("report.Rmd", tempReport[1], overwrite = TRUE)
+          file.copy("preamble-latex.tex", tempReport[2], overwrite = TRUE)
+        } else {
+          file.copy("report-doc.Rmd", tempReport[1], overwrite = TRUE)
+
+        }
 
         params <- list(title = input$project_name,
                        description = input$project_desc,
@@ -226,7 +232,6 @@ function(input, output, session) {
 
         rmarkdown::render(tempReport[1],
                           output_file = file,
-                          output_format = input$report_format,
                           params = params,
                           envir = new.env(parent = globalenv())
         )
