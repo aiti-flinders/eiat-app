@@ -1,6 +1,5 @@
 function(input, output, session) {
 
-  thematic::thematic_shiny()
 
   options(DT.options = list(pageLength = 20,
                             dom = "t"))
