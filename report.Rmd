@@ -4,19 +4,21 @@ output:
   bookdown::pdf_document2:
     toc: false
     number_sections: false    
-    includes:
-      in_header: preamble-latex.tex
 header-includes:
-- \usepackage{booktabs}
-- \usepackage{longtable}
-- \usepackage{array}
-- \usepackage{multirow}
-- \usepackage{wrapfig}
-- \usepackage{float}
-- \usepackage{colortbl}
-- \usepackage{pdflscape}
-- \usepackage{tabu}
-- \usepackage{threeparttable}        
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{array}
+  - \usepackage{multirow}
+  - \usepackage{wrapfig}
+  - \usepackage{float}
+  - \usepackage{colortbl}
+  - \usepackage{pdflscape}
+  - \usepackage{tabu}
+  - \usepackage{threeparttable} 
+  - \usepackage{float}
+  - \let\origfigure\figure
+  - \let\endorigfigure\endfigure
+  - \renewenvironment{figure}[1][2] {\expandafter\origfigure\expandafter[H]} {\endorigfigure}
 author: "Prepared by `r params$author`"
 params:
   title: "Project Title"
@@ -133,8 +135,8 @@ params$data %>%
   labs(x = NULL,
        y = NULL, 
        title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
-  guides(fill = guide_legend(nrow = ceiling((l/19)*7))) + 
-  scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
+  scale_y_continuous(labels = scales::dollar_format(suffix = "M")) +
+  guides(fill = guide_legend(nrow = ceiling(l/2)))
 if (shiny::isRunning()) {setProgress(0.3)}
 ```
 
