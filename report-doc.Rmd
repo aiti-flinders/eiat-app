@@ -111,7 +111,7 @@ params$data %>%
 if (shiny::isRunning()) {setProgress(0.2)}
 ```
 
-```{r fig.id = 'industry-input', results = 'asis', fig.cap = "Direct Capital Expenditure Summary by Industry", include = "Summary input data" %in% params$include_graphs}
+```{r fig.id = 'industry-input', results = 'asis', fig.cap = "Direct Capital Expenditure Summary by Industry", include = "Summary input data" %in% params$include_graphs, fig.asp = 1}
 
 cat("Figure \\@ref(fig:industry-input) summarises the direct capital expenditure estimated to occur for each industry and year of the project.\n\n")
 
@@ -133,7 +133,8 @@ params$data %>%
        y = NULL, 
        title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
   guides(fill = guide_legend(nrow = ceiling((l/19)*7))) + 
-  scale_y_continuous(labels = scales::dollar_format(suffix = "M"))
+  scale_y_continuous(labels = scales::dollar_format(suffix = "M")) + 
+  guides(fill = guide_legend(nrow = ceiling(l/2)))
 if (shiny::isRunning()) {setProgress(0.3)}
 ```
 
@@ -169,7 +170,8 @@ data[["emp"]] %>%
   mutate(across(where(is.numeric), ~round(.x))) %>%
   flextable() %>% 
   bold(nrow(params$data) + 1) %>%
-  set_table_properties(layout = "autofit")
+  set_table_properties(layout = "autofit") %>%
+  colformat_double(digits = 0)
 
 if (shiny::isRunning()) {setProgress(0.5)}
 ```
@@ -184,13 +186,14 @@ data[["emp"]] %>%
   adorn_totals() %>% 
   flextable() %>%
   bold(nrow(params$data) + 1)   %>%
-  set_table_properties(layout = "autofit")
+  set_table_properties(layout = "autofit") %>%
+  colformat_double(digits = 0)
 
 if (shiny::isRunning()) {setProgress(0.6)}
 ```
 
 ```{r tab.id = "emp-total-table", tab.cap = "Estimated Total employment impacts by industry by year", include = "Total employment impacts" %in% params$include_tables, results = 'asis'}
-cat("Table \\@ref(tab:emp-total-table) sumamries the esimtated *Total Employment* impacts induced by the change in final demand associated with this project. Total employment is the sum of direct and flow-on employment.\n\n")
+cat("Table \\@ref(tab:emp-total-table) summarises the estimated *Total Employment* impacts induced by the change in final demand associated with this project. Total employment is the sum of direct and flow-on employment.\n\n")
 
 data[["emp"]] %>% 
   filter(type == "Total Employment") %>%
@@ -199,7 +202,8 @@ data[["emp"]] %>%
   adorn_totals() %>% 
   flextable() %>%
   bold(nrow(params$data) + 1)   %>%
-  set_table_properties(layout = "autofit")
+  set_table_properties(layout = "autofit") %>%
+  colformat_double(digits = 0)
 
 if (shiny::isRunning()) {setProgress(0.7)}
 ```
@@ -216,7 +220,8 @@ data[["emp"]] %>%
   rename(`Employment type` = type) %>%
   flextable() %>%
   bold(3)   %>%
-  set_table_properties(layout = "autofit") 
+  set_table_properties(layout = "autofit") %>%
+  colformat_double(digits = 0)
 
 if (shiny::isRunning()) {setProgress(0.8)}
 ```
@@ -248,7 +253,8 @@ data[["grp"]] %>%
   mutate(across(where(is.numeric), ~round(.x))) %>%
   flextable() %>%
   bold(nrow(params$data) + 1)  %>%
-  set_table_properties(layout = "autofit")
+  set_table_properties(layout = "autofit") %>%
+  colformat_double(digits = 1)
 
 
 ```
@@ -263,7 +269,8 @@ data[["grp"]] %>%
   adorn_totals() %>% 
   flextable() %>%
   bold(nrow(params$data) + 1)  %>%
-  set_table_properties(layout = "autofit")
+  set_table_properties(layout = "autofit") %>%
+  colformat_double(digits = 1)
 
 ```
 
@@ -277,7 +284,8 @@ data[["grp"]] %>%
   adorn_totals() %>% 
   flextable() %>%
   bold(nrow(params$data) + 1)   %>%
-  set_table_properties(layout = "autofit")
+  set_table_properties(layout = "autofit") %>%
+  colformat_double(digits = 1)
 
 ```
 
@@ -293,7 +301,8 @@ data[["grp"]] %>%
   rename(`Employment type` = type) %>%
   flextable() %>%
   bold(3)    %>%
-  set_table_properties(layout = "autofit")
+  set_table_properties(layout = "autofit") %>%
+  colformat_double(digits = 1)
 
 if (shiny::isRunning()) {setProgress(0.95)}
 ```
