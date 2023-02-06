@@ -27,6 +27,9 @@ inputServer <- function(id, region, impact) {
     function(input, output, session) {
 
       create_plot <- reactive({
+        if (all(impact() == 0)) {
+          validate("Please enter data in Project Setup to continue. ")
+        }
         validate(need(input$input_type, message = FALSE))
         if (input$input_type == "Direct Capital Expenditure") {
           impact() %>%
@@ -84,6 +87,9 @@ inputServer <- function(id, region, impact) {
 
 
       output$input_table <- renderDataTable({
+        if (all(impact() == 0)) {
+          validate("Please enter data in Project Setup to continue. ")
+        }
         impact() %>%
           as_tibble(rownames = "sector") %>%
           summarise(across(where(is.double), sum)) %>%
@@ -93,10 +99,16 @@ inputServer <- function(id, region, impact) {
                     extensions = "Buttons",
                     options = list(dom = "Bt",
                                    buttons = c("copy", "csv", "excel", "pdf", "print")))
+
       })
 
 
       output$input_table_sector <- renderDataTable({
+
+        if (all(impact() == 0)) {
+          validate("Please enter data in Project Setup to continue. ")
+        }
+
         impact() %>%
           as_tibble(rownames = "Industry Sector") %>%
           filter(rowSums(across(where(is.double))) != 0) %>%
@@ -110,9 +122,12 @@ inputServer <- function(id, region, impact) {
 
 
       output$title1 <- renderUI({
+        validate(need(any(impact() != 0), message = F))
         h1(glue("Direct Capital Expenditure ($M) in {region()}"))
       })
       output$title2 <- renderUI({
+        validate(need(any(impact() != 0), message = F))
+
         h1(glue("Direct Capital Expenditure ($M) by Industry in {region()}"))
       })
 
