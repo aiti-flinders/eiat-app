@@ -102,7 +102,7 @@ TotalGraphServer <- function(id, tab, region, impact) {
           filter(grepl("Direct|Flow on", type)) %>%
           group_by(year, type) %>%
           summarise(value = sum(value), .groups = "drop") %>%
-          ggplot(aes(x = year, y = value, fill = type)) +
+          ggplot(aes(x = factor(year), y = value, fill = type)) +
           geom_col() +
           theme_aiti(flipped = FALSE, colour = "grey") +
           labs(x = NULL,
