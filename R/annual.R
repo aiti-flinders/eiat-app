@@ -31,11 +31,17 @@ AnnualServer <- function(id, tab, region, impact) {
                  "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}")),
                  "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}")))
 
-        } else {
+        } else if (length(input$year_radio) == 1) {
 
         switch(tab,
                "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}: {input$year_radio}")),
                "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}: {input$year_radio}")))
+        } else {
+
+          switch(tab,
+                 "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}: {paste0(input$year_radio, collapse = ', ')}")),
+                 "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}: {paste0(input$year_radio, collapse = ', ')}")))
+
         }
 
 
@@ -47,8 +53,9 @@ AnnualServer <- function(id, tab, region, impact) {
           validate("Enter data in Project Setup to calculate economic impacts.")
         }
         choices <- 2023:(2023 + ncol(impact()) - 1)
-        radioButtons(inputId = session$ns("year_radio"),
+        checkboxGroupInput(inputId = session$ns("year_radio"),
                      label = NULL,
+                     selected = first(choices),
                      choices = choices,
                      inline = TRUE)
       })
@@ -63,14 +70,22 @@ AnnualServer <- function(id, tab, region, impact) {
         }
 
         if (tab == "emp") {
+
+          cols <- ifelse(length(input$year_radio) == 1, 4, (2+length(input$year_radio)) - 1)
+
           disp <- function(table) {
-            formatRound(table, c(2:4), 0)
+            formatRound(table, 2:cols, digits = 0)
           }
         } else {
+
+          cols <- ifelse(length(input$year_radio) == 1, 4, (2+length(input$year_radio)) - 1)
+
           disp <- function(table) {
-            formatCurrency(table, c(2:4), currency = "$M", before = FALSE, digits = 1)
+            formatCurrency(table, 2:cols, currency = "$M", before = FALSE, digits = 1)
           }
         }
+
+        if (length(input$year_radio) <= 1) {
 
         impact_data() %>%
           filter(year == input$year_radio) %>%
@@ -87,6 +102,23 @@ AnnualServer <- function(id, tab, region, impact) {
                     options = list(dom = "Bt",
                                    buttons = c("copy", "csv", "excel", "pdf", "print"))) %>%
           disp()
+
+        } else if (length(input$year_radio) >=2) {
+
+          impact_data() %>%
+            filter(grepl("Total", type),
+                   year %in% input$year_radio) %>%
+            pivot_wider(names_from = year,
+                        values_from = value) %>%
+            select(-type) %>%
+            janitor::adorn_totals() %>%
+            datatable(rownames = FALSE,
+                      extensions = "Buttons",
+                      options = list(dom = "Bt",
+                                     buttons = c("copy", "csv", "excel", "pdf", "print"))) %>%
+            disp()
+
+        }
       })
 
 
@@ -123,18 +155,22 @@ AnnualGraphServer <- function(id, tab, region, impact) {
       output$title <- renderUI({
 
         if (is.null(input$year_radio)) {
-
           switch(tab,
                  "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}")),
                  "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}")))
 
+        } else if (length(input$year_radio) == 1) {
+
+          switch(tab,
+                 "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}: {input$year_radio}")),
+                 "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}: {input$year_radio}")))
         } else {
 
-        switch(tab,
-               "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}: {input$year_radio}")),
-               "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}: {input$year_radio}")))
-        }
+          switch(tab,
+                 "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}: {paste0(input$year_radio, collapse = ', ')}")),
+                 "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}: {paste0(input$year_radio, collapse = ', ')}")))
 
+        }
 
       })
 
@@ -144,7 +180,8 @@ AnnualGraphServer <- function(id, tab, region, impact) {
           validate(FALSE)
         }
         choices <- 2023:(2023 + ncol(impact()) - 1)
-        radioButtons(inputId = session$ns("year_radio"),
+        checkboxGroupInput(inputId = session$ns("year_radio"),
+                     selected = 2023,
                      label = NULL,
                      choices = choices,
                      inline = TRUE)
@@ -153,17 +190,33 @@ AnnualGraphServer <- function(id, tab, region, impact) {
       create_plot <- reactive({
 
         if (tab == "emp") {
+          if (length(input$year_radio) == 1) {
           x_axis <- scale_x_continuous(labels = scales::comma_format(),
                                        expand = expansion(mult = c(0, 0.1)))
           title <-  glue("Employment Impacts by Industry (FTE) in {region()}: {input$year_radio}")
           fct_lvls <- c("Flow on Employment", "Direct Employment")
 
+          } else {
+            x_axis <- scale_x_discrete()
+            title <- "Test Title"
+          }
+
+
         } else {
-          x_axis <- scale_x_continuous(labels = scales::dollar_format(suffix = "M"),
-                                       expand = expansion(mult = c(0, 0.1)))
-          title <- glue("Gross Regional Product Impacts by Industry ($M): {region()} {input$year_radio}")
-          fct_lvls <- c("Flow on GRP", "Direct GRP")
+          if (length(input$year_radio) == 1) {
+            x_axis <- scale_x_continuous(labels = scales::dollar_format(suffix = "M"),
+                                         expand = expansion(mult = c(0, 0.1)))
+            title <- glue("Gross Regional Product Impacts by Industry ($M): {region()} {input$year_radio}")
+            fct_lvls <- c("Flow on GRP", "Direct GRP")
+          } else {
+            x_axis <- scale_x_discrete()
+            title <- "Test Title"
+          }
+
+
         }
+
+        if (length(input$year_radio) == 1) {
 
         impact_data() %>%
           filter(grepl("Direct|Flow on", type),
@@ -175,9 +228,27 @@ AnnualGraphServer <- function(id, tab, region, impact) {
                y = NULL,
                title = title) +
           x_axis +
-          theme_aiti(colour = "grey",
+          theme_aiti(base_size = 15,
+                     colour = "grey",
                      flipped = TRUE) +
           scale_fill_aiti()
+        } else {
+
+          impact_data() %>%
+            filter(grepl("Total", type),
+                   year %in% input$year_radio) %>%
+            mutate(year = factor(year)) %>%
+            ggplot(aes(x = year, y = value)) +
+            geom_col(aes(fill = Sector)) +
+            labs(x = NULL,
+                 y = NULL,
+                 title = title) +
+            x_axis +
+            theme_aiti(base_size = 15,
+                       colour = "grey",
+                       flipped = F)
+
+        }
       })
 
       output$annual_plot <- renderPlot({
