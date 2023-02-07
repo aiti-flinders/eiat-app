@@ -126,6 +126,7 @@ function(input, output, session) {
   observeEvent(input$years, {
 
     req(input$years)
+    req(iv$is_valid())
 
     if (is.null(input$upload)) {
       entered <- input$industry_input
@@ -245,6 +246,20 @@ function(input, output, session) {
   # Inputs ------------------------------------------------------------------
 
   inputServer("input_summary", reactive(input$lga), reactive(input$industry_input))
+
+
+  # NumericInput Validation -------------------------------------------------
+
+  iv <- InputValidator$new()
+  iv$add_rule("years", sv_between(1,10))
+  iv$enable()
+
+  observeEvent(input$years, {
+    if (!iv$is_valid()) {
+      showNotification("The EIAT only supports economic assessments between 1 and 10 years.",
+                       type = "warning")
+    }
+  })
 
 
   # Base Data ---------------------------------------------------------------

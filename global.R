@@ -7,6 +7,7 @@ library(ggplot2)
 library(aititheme)
 library(glue)
 library(janitor)
+library(shinyvalidate)
 
 regions <- eiat:::get_available_regions(2021)
 
