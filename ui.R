@@ -7,6 +7,7 @@ navbarPage("Economic Impact Assessment Tool",
            fluid = TRUE,
            tabPanel("Description",
                     fluidRow(
+                      useShinyjs(),
                       column(width = 12,
                              h1("Economic Impact Analysis Tool"),
                              p("EIAT is an online input-output (I-O) analysis tool for Local Goverment Areas across Australia.

@@ -18,7 +18,7 @@ function(input, output, session) {
                             validate("Invalid file; Please upload a .csv file.")
     )
 
-    intended_cols <- "Sector|2023|2024|2025|2026|2027|2028|2029|2030|2031|2032|2033"
+    intended_cols <- "Sector|2023|2024|2025|2026|2027|2028|2029|2030|2031|2032"
 
 
     if (any(class(uploaded_file) == "try-error")) {
@@ -48,6 +48,17 @@ function(input, output, session) {
       ))
 
       n_col <- ncol(uploaded_data)
+
+      if (n_col > 10) {
+        showModal(modalDialog(
+          title = "Warning",
+          "The data you have uploaded exceeds the 10 year limitation of the EIAT App.
+          Only the first 10 years worth of data have been uploaded"
+        ))
+
+        uploaded_data <- uploaded_data[1:10]
+        n_col <- 10
+      }
 
       m <- matrix(sapply(uploaded_data, cbind, simplify = TRUE),
                   nrow = 19,
@@ -119,13 +130,20 @@ function(input, output, session) {
   # If initial matrix is 2022, 2023, 2024 and need to add 2 columns (from 3 years -> 5 years), new matrix
   # has 2 columns with names 2025, 2026
 
+  v <- reactiveValues(
+    upload_state =  NULL
+  )
 
+  observeEvent(input$upload, {
+    v$upload_state <- "uploaded"
+  })
 
-
+  observeEvent(input$clear, {
+    v$upload_state <- "reset"
+  })
 
   observeEvent(input$years, {
 
-    req(input$years)
     req(iv$is_valid())
 
     if (is.null(input$upload)) {
@@ -147,8 +165,16 @@ function(input, output, session) {
         m <- input$industry_input
       }
 
+    } else if (v$upload_state == "reset") {
+      col_names <- 2023:(2023 + input$years - 1)
+
+      m <- matrix(0,
+             nrow = 19,
+             ncol = input$years,
+             dimnames = list(eiat:::anzsic_swap$name,
+                             col_names))
     } else {
-      m <- user_matrix()
+      m <- user_matrix()[, 1:input$years, drop = FALSE]
     }
     updateMatrixInput(session, "industry_input", m)
   })
@@ -161,6 +187,7 @@ function(input, output, session) {
     col_names <- 2023:(2023 + input$years - 1)
 
     m <- matrix(0, nrow = 19, ncol = input$years, dimnames = list(eiat:::anzsic_swap$name, col_names))
+    shinyjs::reset("upload")
     updateMatrixInput(session, "industry_input", m)
 
   })

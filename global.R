@@ -8,6 +8,7 @@ library(aititheme)
 library(glue)
 library(janitor)
 library(shinyvalidate)
+library(shinyjs)
 
 regions <- eiat:::get_available_regions(2021)
 
