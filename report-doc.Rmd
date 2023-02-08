@@ -147,7 +147,7 @@ data <- impact_analysis(region = params$region,
 
 ## Employment Impacts
 
-This project is estimated to generate `r scales::comma_format()(sum(data[["emp"]]$value))` jobs over `r max(as.numeric(data[["emp"]]$year)) - min(as.numeric(data[["emp"]]$year)) + 1` year(s). `r  round(sum(data[["emp"]][data[["emp"]]$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  round(sum(data[["emp"]][data[["emp"]]$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy.
+This project is estimated to generate `r scales::comma_format()(sum(data[["emp"]][data[["emp"]]$type %in% c("Direct Employment", "Flow on Employment"), ]$value))` jobs over `r max(as.numeric(data[["emp"]]$year)) - min(as.numeric(data[["emp"]]$year)) + 1` year(s). `r  round(sum(data[["emp"]][data[["emp"]]$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  round(sum(data[["emp"]][data[["emp"]]$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy.
 
 ```{r fig.id = 'emp-graph', fig.cap = "Employment Impacts", include = "Employment impacts" %in% params$include_graphs, results = 'asis'}
 
@@ -230,7 +230,7 @@ if (shiny::isRunning()) {setProgress(0.8)}
 
 ## Gross Regional Product Impacts
 
-This project is estimated to generate `r round(sum(data[["grp"]]$value))` million dollars in Gross Regional Product (GRP) over `r max(as.numeric(data[["grp"]]$year)) - min(as.numeric(data[["grp"]]$year)) + 1` year(s). `r round(sum(data[["grp"]][data[["grp"]]$type == "Direct GRP",]$value))` of this is generated as a result of the direct capital expenditure, and the remaining `r  round(sum(data[["grp"]][data[["grp"]]$type == "Flow on GRP",]$value))` is generated through this expenditure flowing through to other sectors of the economy.
+This project is estimated to generate `r round(sum(data[["grp"]][data[["grp]]$type %in% c("Direct GRP", "Flow on GRP"), ]$value))` million dollars in Gross Regional Product (GRP) over `r max(as.numeric(data[["grp"]]$year)) - min(as.numeric(data[["grp"]]$year)) + 1` year(s). `r round(sum(data[["grp"]][data[["grp"]]$type == "Direct GRP",]$value))` of this is generated as a result of the direct capital expenditure, and the remaining `r  round(sum(data[["grp"]][data[["grp"]]$type == "Flow on GRP",]$value))` is generated through this expenditure flowing through to other sectors of the economy.
 
 ```{r fig.id = 'grp', fig.cap = "Gross Regional Product Impacts", results = 'asis', include = "GRP impacts" %in% params$include_graphs}
 
