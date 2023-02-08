@@ -58,7 +58,7 @@ The estimated economic impacts in terms of employment, and Gross Regional Produc
 
 The annual impacts table shows the estimated Direct, Flow-on and Total employment or GRP generated through the direct capital expenditure entered into the tool. Each years data can be exported, or viewed as a graph.
 
-| Multiple years can be selected in the annual impacts tables - but will not dis-aggregate impacts by direct and flow-on - showing only the totals. 
+| Multiple years can be selected in the annual impacts tables - but will not dis-aggregate impacts by direct and flow-on - showing only the totals.
 
 The total impacts table shows the total estimated Direct, Flow-on, and Total employment or GRP generated across the entire duration of the investment.
 
@@ -71,6 +71,47 @@ A report summarising the economic impact assessment of a project can be automati
 #### Base Data
 
 The tool includes a 19 sector version of the national input-output table, a summary of employment in the selected region, and the derived 19 sector version of the regional input-output table, for the selected region. These can each be exported to Excel.
+
+## Guided Example
+
+It has been proposed to upgrade an existing road in the South Australian Local Government Area of the Adelaide Hills. The road is estimated to cost about \$10 million over two years, with some design and surveying to occur in the first year, and the bulk of the construction to occur in the second year.
+
+The economic impact of this project on the Adelaide Hills region could be estimated using the EIAT, however to do so, the user must consider how to allocate the \$10 million dollars of expenditure - both across time, and across industries.
+
+The user knows the local area well, and knows that the road upgrade is relatively simple - there are no tunnels or grade separation, and estimates that about 20% of the total project cost would occur in the design and surveying phase, all occurring in the first year. The user also knows that the design would be carried about by a local firm, but the surveying would be done by a firm from another part of South Australia. An additional \$1 million is estimated to support hiring on site offices and facilities, again from a local firm.
+
+The user also estimates that although construction will begin in 2023, the majority of the construction activity will occur in 2024. They also choose to make an estimate of how much of the construction activity can be sourced from within the Adelaide Hills LGA. Given the size of the project, and local knowledge of the industry, the user makes a conservative estimate that the construction company will need to import about half of all the products and services they require for the project.
+
+As such, the user decides to allocate the direct capital expenditure across three industry sectors.
+
++-------------------------------------------------+---------------------------+----------------+-------------------------+
+| Sector                                          | 2023                      | 2024           | Total                   |
++=================================================+===========================+================+=========================+
+| Construction                                    | \$0.35 million            | \$3.15 million | \$3.5 million           |
++-------------------------------------------------+---------------------------+----------------+-------------------------+
+| Rental, Hiring and Real Estate Services         | \$0.1 million             | \$0.9 million  | \$1.0 million           |
++-------------------------------------------------+---------------------------+----------------+-------------------------+
+| Professional, Scientific and Technical Services | \$1.5 million (Design)    |                | \$1.5 million (Design)  |
+|                                                 |                           |                |                         |
+|                                                 | \$0.5 million (Surveying) |                | \$0 million (Surveying) |
++-------------------------------------------------+---------------------------+----------------+-------------------------+
+
+### Results
+
+The Input Summary tab shows how expenditure has been allocated across industries and across years. **Note that although the project is estimated to cost \$10 million, only \$6 million is allocated to the region.**
+
+| Region         | 2023 | 2024 |
+|----------------|------|------|
+| Adelaide HIlls | 1.95 | 4.05 |
+
+| Sector                                          | 2023 | 2024 |
+|-------------------------------------------------|------|------|
+| Construction                                    | 0.35 | 3.15 |
+| Rental, Hiring and Real Estate Services         | 0.1  | 0.9  |
+| Professional, Scientific and Technical Services | 1.5  | 0    |
+| Total                                           | 1.95 | 4.05 |
+
+The Economic Impacts tab shows the economic impact of the project. In 2023, the project will generate 7 FTE employees as a direct result of the expenditure. An additional 6 FTE will be generated through the Flow-on effects of the expenditure through the economy. Overall, 13 FTE are created in 2023, with the majority (7) occurring in the Professional, Scientific and Technical Services sector. In 2024, 19 FTE are created.
 
 ## Technical Matters
 
