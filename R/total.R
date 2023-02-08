@@ -25,13 +25,24 @@ TotalServer <- function(id, tab, region, impact) {
         switch(tab,
                "emp" = h3(glue("Employment Impacts by Industry (FTE) in {region()}")),
                "grp" = h3(glue("Gross Regional Product Impacts by Industry ($M) in {region()}")))
-       })
+      })
 
       output$total_table <- renderDataTable({
 
         if (all(impact() == 0)) {
           validate("Enter data in Project Setup to calculate economic impacts. ")
         }
+
+        if (tab == "emp") {
+          disp <- function(table) {
+            formatRound(table, 2:4, digits = 0)
+          }
+        } else {
+          disp <- function(table) {
+            formatCurrency(table, 2:4, currency = "$", before = TRUE, digits = 1)
+          }
+        }
+
 
         impact_data() %>%
           group_by(Sector, type) %>%

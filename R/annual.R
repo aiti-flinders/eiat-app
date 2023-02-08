@@ -71,17 +71,17 @@ AnnualServer <- function(id, tab, region, impact) {
 
         if (tab == "emp") {
 
-          cols <- ifelse(length(input$year_radio) == 1, 4, (2+length(input$year_radio)) - 1)
+          cols <- ifelse(length(input$year_radio) == 1, 4, (2 + length(input$year_radio)) - 1)
 
           disp <- function(table) {
             formatRound(table, 2:cols, digits = 0)
           }
         } else {
 
-          cols <- ifelse(length(input$year_radio) == 1, 4, (2+length(input$year_radio)) - 1)
+          cols <- ifelse(length(input$year_radio) == 1, 4, (2 + length(input$year_radio)) - 1)
 
           disp <- function(table) {
-            formatCurrency(table, 2:cols, currency = "$M", before = FALSE, digits = 1)
+            formatCurrency(table, 2:cols, currency = "$", before = TRUE, digits = 1)
           }
         }
 
@@ -103,7 +103,7 @@ AnnualServer <- function(id, tab, region, impact) {
                                    buttons = c("copy", "csv", "excel", "pdf", "print"))) %>%
           disp()
 
-        } else if (length(input$year_radio) >=2) {
+        } else if (length(input$year_radio) >= 2) {
 
           impact_data() %>%
             filter(grepl("Total", type),
