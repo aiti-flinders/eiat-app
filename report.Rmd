@@ -149,7 +149,7 @@ data <- impact_analysis(region = params$region,
 
 ## Employment Impacts
 
-This project is estimated to generate `r scales::comma_format()(sum(data[["emp"]][data[["emp"]]$type %in% c("Direct Employment", "Flow on Employment"), ]$value))` jobs over `r max(as.numeric(data[["emp"]]$year)) - min(as.numeric(data[["emp"]]$year)) + 1` year(s). `r  round(sum(data[["emp"]][data[["emp"]]$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  round(sum(data[["emp"]][data[["emp"]]$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy.
+This project is estimated to generate `r scales::comma_format(0.1)(sum(data[["emp"]][data[["emp"]]$type %in% c("Direct Employment", "Flow on Employment"), ]$value))` full time equivalent (FTE) jobs over `r max(as.numeric(data[["emp"]]$year)) - min(as.numeric(data[["emp"]]$year)) + 1` year(s). `r  scales::comma_format(0.1)(sum(data[["emp"]][data[["emp"]]$type == "Direct Employment",]$value))` of these jobs are generated as a result of the direct capital expenditure, and the remaining `r  scales::comma_format(0.1)(sum(data[["emp"]][data[["emp"]]$type == "Flow on Employment",]$value))` jobs are generated through this expenditure flowing through to other sectors of the economy.
 
 ```{r emp-graph, fig.cap = "Employment Impacts", include = "Employment impacts" %in% params$include_graphs, results = 'asis'}
 
@@ -171,7 +171,7 @@ data[["emp"]] %>%
   adorn_totals() %>% 
   mutate(across(where(is.numeric), ~round(.x))) %>%
   kbl(digits = 0,
-      caption = "Estimated Direct employment impacts by industry by year.",
+      caption = "Estimated Direct employment impacts (FTE) by industry by year.",
       booktabs = TRUE) %>%
   kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
   column_spec(1, width = "7cm") %>%
@@ -189,7 +189,7 @@ data[["emp"]] %>%
   pivot_wider(names_from = year) %>%
   adorn_totals() %>% 
   kbl(digits = 0,
-      caption = "Estimated Flow on employment impacts by industry by year.",
+      caption = "Estimated Flow on employment impacts (FTE) by industry by year.",
       booktabs = TRUE)  %>%
   kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
   column_spec(1, width = "7cm") %>%
@@ -207,7 +207,7 @@ data[["emp"]] %>%
   pivot_wider(names_from = year) %>%
   adorn_totals() %>% 
   kbl(digits = 0,
-      caption = "Estimated Total employment impacts by industry by year.",
+      caption = "Estimated Total employment impacts (FTE) by industry by year.",
       booktabs = TRUE)  %>%
   kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
   column_spec(1, width = "7cm") %>%
@@ -227,7 +227,7 @@ data[["emp"]] %>%
   pivot_wider(names_from = year) %>%
   rename(`Employment type` = type) %>%
   kbl(digits = 0,
-      caption = "Estimated employment impacts by year.",
+      caption = "Estimated employment impacts (FTE) by year.",
       booktabs = TRUE)  %>%
   kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
   column_spec(1, width = "5cm") %>%
@@ -240,7 +240,7 @@ if (shiny::isRunning()) {setProgress(0.8)}
 
 ## Gross Regional Product Impacts
 
-This project is estimated to generate `r round(sum(data[["grp"]][data[["grp"]]$type %in% c("Direct GRP", "Flow on GRP"), ]$value))` million dollars in Gross Regional Product (GRP) over `r max(as.numeric(data[["grp"]]$year)) - min(as.numeric(data[["grp"]]$year)) + 1` year(s). `r round(sum(data[["grp"]][data[["grp"]]$type == "Direct GRP",]$value))` of this is generated as a result of the direct capital expenditure, and the remaining `r  round(sum(data[["grp"]][data[["grp"]]$type == "Flow on GRP",]$value))` is generated through this expenditure flowing through to other sectors of the economy.
+This project is estimated to generate `r scales::comma_format(.1)(sum(data[["grp"]][data[["grp"]]$type %in% c("Direct GRP", "Flow on GRP"), ]$value))` million dollars in Gross Regional Product (GRP) over `r max(as.numeric(data[["grp"]]$year)) - min(as.numeric(data[["grp"]]$year)) + 1` year(s). `r scales::comma_format(0.1)(sum(data[["grp"]][data[["grp"]]$type == "Direct GRP",]$value))` of this is generated as a result of the direct capital expenditure, and the remaining `r  scales::comma_format(.1)(sum(data[["grp"]][data[["grp"]]$type == "Flow on GRP",]$value))` is generated through this expenditure flowing through to other sectors of the economy.
 
 ```{r grp, fig.cap = "Gross Regional Product Impacts", results = 'asis', include = "GRP impacts" %in% params$include_graphs}
 
