@@ -43,7 +43,7 @@ inputServer <- function(id, region, impact) {
             labs(x = NULL,
                  y = NULL,
                  title = glue("Direct Capital Expenditure ($M): {region()}")) +
-            scale_y_continuous(labels = scales::dollar_format(suffix = "M", scale = 0.1))
+            scale_y_continuous(labels = scales::dollar_format(suffix = "M", accuracy = 0.1))
         } else {
           impact() %>%
             as_tibble(rownames = "sector") %>%
@@ -55,7 +55,7 @@ inputServer <- function(id, region, impact) {
             labs(x = NULL,
                  y = NULL,
                  title = glue("Direct Capital Expenditure ($M) by Industry in {region()}")) +
-            scale_y_continuous(labels = scales::dollar_format(suffix = "M")) +
+            scale_y_continuous(labels = scales::dollar_format(suffix = "M", accuracy = 0.1)) +
             guides(fill = guide_legend(nrow = 2))
 
         }

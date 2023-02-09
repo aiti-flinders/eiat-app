@@ -74,7 +74,7 @@ AnnualServer <- function(id, tab, region, impact) {
           cols <- ifelse(length(input$year_radio) == 1, 4, (2 + length(input$year_radio)) - 1)
 
           disp <- function(table) {
-            formatRound(table, 2:cols, digits = 0)
+            formatRound(table, 2:cols, digits = 1)
           }
         } else {
 

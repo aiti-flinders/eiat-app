@@ -35,7 +35,7 @@ TotalServer <- function(id, tab, region, impact) {
 
         if (tab == "emp") {
           disp <- function(table) {
-            formatRound(table, 2:4, digits = 0)
+            formatRound(table, 2:4, digits = 1)
           }
         } else {
           disp <- function(table) {
@@ -61,7 +61,7 @@ TotalServer <- function(id, tab, region, impact) {
                     extensions = "Buttons",
                     options = list(dom = "Bt",
                                    buttons = c("copy", "csv", "excel", "pdf", "print"))) %>%
-          formatRound(c(2:4), 0)
+          disp()
       })
 
 
