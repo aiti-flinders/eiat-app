@@ -18,16 +18,17 @@ navbarPage("Economic Impact Assessment Tool",
                       major projects and policies has become a critical part of regional development analysis, and is an extensive component
                       of the applied economic literature. The linkages between employment opportunities and residents - and business to business linkages affect
                       urban design and transport systems, infrastructure demand, and regional taxes, amongst others."),
-                      h2("Data Summary"),
+                      column(width = 6,
+                             h2("Data Summary"),
                       p("This tool draws on data from the following sources."),
                       p(tags$b("Employment by industry: "),"2021 Census, last updated 3 October 2022"),
                       p(tags$b("National Input-Output table: "), "Australian Bureau of Statistics, last updated 27 June 2022"),
                       p(tags$b("Regional Input-Output tables: "), "Derived from the national I-O table using a
                                location quotient model. The source code is available", a(href = 'https://github.com/aiti-flinders/eiat', 'here.'),
                         "The current version is: ", as.character(packageVersion("eiat")))
-
-
-                      )
+                      ),
+                      column(width = 6)
+                    )
                     ),
                     tags$hr(),
                     fluidRow(
@@ -39,7 +40,8 @@ navbarPage("Economic Impact Assessment Tool",
                              taxes, and subsidies. Only expenditure which is expected to occur inside the region should be entered. Expenditures that
                              occur outside of the region should be excluded from the analysis. This includes expenditure which may be allocated to a region but
                              must be imported from outside the region. The tool is agnostic to input data. Any reporting of potential economic impacts
-                             should also include a summary of the data used to generate the impact.")
+                             should also include a summary of the data used to generate the impact."),
+                             p("A user guide for the EIAT is available for download", a("here.", href = "https://github.com/aiti-flinders/eiat-app/raw/main/user_guide.pdf", target = "_blank"))
                       ),
                       column(width = 6,
                              h2("Important Assumptions"),
@@ -206,10 +208,10 @@ navbarPage("Economic Impact Assessment Tool",
                     fluidRow(
                       column(width = 4,
                              fluidRow(style = "margin-right:0px; margin-left:0px",
-                             textInput("filename", "Filename", placeholder = "Filename"),
-                             radioButtons("report_format", "Report Format",
-                                          choiceNames = c("PDF", "Word Document"),
-                                          choiceValues = c(".pdf", ".docx"))
+                                      textInput("filename", "Filename", placeholder = "Filename"),
+                                      radioButtons("report_format", "Report Format",
+                                                   choiceNames = c("PDF", "Word Document"),
+                                                   choiceValues = c(".pdf", ".docx"))
                              )
                       ),
                       column(width = 4,
@@ -234,10 +236,10 @@ navbarPage("Economic Impact Assessment Tool",
                                                 selected = c("Summary input data", "Employment impacts", "GRP impacts"))
                       ),
                       column(width = 12,
-                             downloadButton("report", "Generate Report")
+                             downloadButton("report", "Generate Report"),
+                             downloadButton("data", "Download All Data")
                       )
                     )
-
            )
 )
 

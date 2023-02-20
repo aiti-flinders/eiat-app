@@ -233,6 +233,8 @@ function(input, output, session) {
 
   # Report ------------------------------------------------------------------
 
+  ## Download report
+
   output$report <- downloadHandler(
     filename = function() {
       paste0(input$filename, input$report_format)
@@ -265,6 +267,48 @@ function(input, output, session) {
       })
     }
   )
+
+  ## Download data
+
+  # Input data
+  input_data <- reactive({
+    as_tibble(input$industry_input, rownames = "Sector")
+  })
+  get_impacts <- function(impact_type, impact) {
+    reactive({
+      impact_analysis(input$lga,
+                    input$industry_input) %>%
+        .[[impact]] %>%
+        filter(type == impact_type) %>%
+        pivot_wider(names_from = year,
+                    values_from = value)
+  })
+  }
+
+
+  output$data <- downloadHandler(
+    filename = function() {
+      "EIAT Data Summary.xlsx"
+    },
+    content = function(file) {
+      withProgress(message = "Collecting data, please wait!", {
+         writexl::write_xlsx(
+           list(`Input` = input_data(),
+                `Employment Impacts (Direct)` = get_impacts("Direct Employment", "emp")(),
+                `Employment Impacts (Flow on)` = get_impacts("Flow on Employment", "emp")(),
+                `Employment Impacts (Total)` = get_impacts("Total Employment", "emp")(),
+                `GRP Impacts (Direct)` = get_impacts("Direct GRP", "grp")(),
+                `GRP Impacts (Flow on)` = get_impacts("Flow on GRP", "grp")(),
+                `GRP Impacts (Total)` = get_impacts("Total GRP", "grp")(),
+                `Regional Input Output Table` = as_tibble(lq_models[[input$lga]], rownames = "Sector")),
+           file)
+
+
+      })
+    }
+  )
+
+
 
 
 
