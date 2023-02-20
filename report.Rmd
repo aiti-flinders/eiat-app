@@ -81,7 +81,8 @@ The direct capital expenditure change estimated to occur in `r params$region` is
 params$data %>%
   as_tibble(rownames = "Industry") %>%
   adorn_totals() %>%
-  kbl(caption = "Estimated regional demand change, (\\$M)",
+  kbl(caption = "Estimated regional demand change, (\\$M)", 
+      digits = 1,
       booktabs = TRUE) %>%
   kable_styling(full_width = TRUE, latex_options = c("hold_position")) %>%
   column_spec(1, width = "7cm") %>%
