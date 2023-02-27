@@ -133,6 +133,7 @@ params$data %>%
        y = NULL, 
        title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
   guides(fill = guide_legend(nrow = ceiling((l/19)*7))) + 
+  scale_fill_discrete(labels = function(x) str_wrap(x, width = 40)) + 
   scale_y_continuous(labels = scales::dollar_format(suffix = "M")) + 
   guides(fill = guide_legend(nrow = ceiling(l/2)))
 if (shiny::isRunning()) {setProgress(0.3)}

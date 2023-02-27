@@ -44,6 +44,7 @@ params:
 ```{r setup, include = FALSE}
 library(dplyr)
 library(tidyr)
+library(stringr)
 library(ggplot2)
 library(aititheme)
 library(glue)
@@ -126,6 +127,8 @@ l <- params$data %>%
   distinct(sector) %>%
   nrow()
 
+
+
 params$data %>%
   as_tibble(rownames = "sector") %>%
   pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
@@ -137,6 +140,7 @@ params$data %>%
        y = NULL, 
        title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
   scale_y_continuous(labels = scales::dollar_format(suffix = "M")) +
+  scale_fill_discrete(labels = function(x) str_wrap(x, width = 40)) + 
   guides(fill = guide_legend(nrow = ceiling(l/2)))
 if (shiny::isRunning()) {setProgress(0.3)}
 ```
