@@ -1,6 +1,6 @@
 ---
 title: "EIAT User Guide"
-format: pdf
+output: pdf_document
 editor: visual
 ---
 
@@ -35,7 +35,7 @@ When this data has been collected, the EIAT can be accessed [here](https://aiti.
 
 ### Setting project parameters
 
-![](images/paste-B74C942E.png)
+![](images/project-parameters.png)
 
 The project parameters can be adjusted by selecting **Project Setup** from the navigation bar at the top of the page. First select the State, and then the Local Government Area of interest.
 
@@ -43,11 +43,11 @@ The project parameters can be adjusted by selecting **Project Setup** from the n
 
 There are two options to enter data into the tool. For relatively simple analyses the user can first select the number of years into the future over which the investment will continue. It is by default set to 1, and the first year is the current year.
 
-![](images/paste-3F7FC1A9.png)
+![](images/entering-data.png)
 
 Next, enter the direct capital expenditure for each industry sector into the table. Remember that these expenditures must be in basic (sometimes called producer) prices - that is, they should exclude margins, taxes, and subsidies - and must only be for expenditure which will occur (or is expected to occur) within the region.
 
-![](images/paste-705B66C4.png)
+![](images/data-input.png)
 
 If you have a more complex analysis or want to keep a record of the estimated expenditures, a template can be downloaded, based on the parameters set out above, which can be opened in Microsoft Excel, OpenOffice, or Google Sheets. The file can be renamed, but only .csv files will be accepted by the tool. Once the data has been entered into the template, it can be uploaded using the 'Uploaded Data' button.
 
@@ -57,11 +57,11 @@ If you have a more complex analysis or want to keep a record of the estimated ex
 
 Once the direct capital expenditure data have been entered, a summary of the input data can be obtained by selecting the **Input Summary** tab from the navigation panel. Summary tables display the total direct capital expenditure in the region by year, and by industry and year. These tables can be downloaded, copied to clipboard, or printed, by clicking the relevant button.
 
-![](images/paste-56EEC5A2.png)
+![](images/trable-buttons.png)
 
 Summary graphs visualise the input data by year, and by industry and year. These graphs can also be downloaded as .png, .jpeg, and .pdf using the controls shown below the graph.
 
-![](images/paste-1FE169EA.png)
+![](images/download-graphs.png)
 
 The estimated economic impacts in terms of employment, and GRP can be seen by selecting the Economic Impacts tab from the navigation panel. For both employment impacts, and GRP impacts, annual and total tables and graphs can be viewed.
 
@@ -83,7 +83,7 @@ The tool includes a 19 sector version of the national input-output table, a summ
 
 ## Guided Example
 
-It has been proposed to upgrade an existing road in the South Australian Local Government Area of the Adelaide Hills. The road construction is estimated to cost about \$10 million over two years, with some design and surveying to occur in the first year, and the bulk of the construction to occur in the second year.
+It has been proposed to upgrade an existing road in the South Australian Local Government Area of the **Adelaide Hills**. The road construction is estimated to cost about \$10 million over two years, with some design and surveying to occur in the first year, and the bulk of the construction to occur in the second year.
 
 The economic impact of this project on the Adelaide Hills region can be estimated using the EIAT. To do so, the user must consider how to allocate the \$10 million dollars of expenditure - both across time and across industries.
 
@@ -93,17 +93,17 @@ The user also estimates that although construction will begin in 2023, the major
 
 As such, the user decides to allocate the direct capital expenditure across three industry sectors.
 
-+-------------------------------------------------+---------------------------+----------------+-------------------------+
-| Sector                                          | 2023                      | 2024           | Total                   |
-+=================================================+===========================+================+=========================+
-| Construction                                    | \$0.35 million            | \$3.15 million | \$3.5 million           |
-+-------------------------------------------------+---------------------------+----------------+-------------------------+
-| Rental, Hiring and Real Estate Services         | \$0.1 million             | \$0.9 million  | \$1.0 million           |
-+-------------------------------------------------+---------------------------+----------------+-------------------------+
-| Professional, Scientific and Technical Services | \$1.5 million (Design)    |                | \$1.5 million (Design)  |
-|                                                 |                           |                |                         |
-|                                                 | \$0.5 million (Surveying) |                | \$0 million (Surveying) |
-+-------------------------------------------------+---------------------------+----------------+-------------------------+
++-------------------------------------------------+-------------------------+----------------+-------------------------+
+| Sector                                          | 2023                    | 2024           | Total                   |
++=================================================+=========================+================+=========================+
+| Construction                                    | \$0.35 million          | \$3.15 million | \$3.5 million           |
++-------------------------------------------------+-------------------------+----------------+-------------------------+
+| Rental, Hiring and Real Estate Services         | \$0.1 million           | \$0.9 million  | \$1.0 million           |
++-------------------------------------------------+-------------------------+----------------+-------------------------+
+| Professional, Scientific and Technical Services | \$1.5 million (Design)  |                | \$1.5 million (Design)  |
+|                                                 |                         |                |                         |
+|                                                 | \$0 million (Surveying) |                | \$0 million (Surveying) |
++-------------------------------------------------+-------------------------+----------------+-------------------------+
 
 ### Results
 
@@ -120,7 +120,7 @@ The Input Summary tab shows how expenditure has been allocated across industries
 | Professional, Scientific and Technical Services | 1.5  | 0    |
 | Total                                           | 1.95 | 4.05 |
 
-The Economic Impacts tab shows the economic impact of the project. In 2023, the project will generate 7 Full Time Equivalent (FTE) employees as a direct result of the expenditure. An additional 6 FTE will be generated through the Flow-on effects of the expenditure through the economy. Overall, 13 FTE are created in 2023, with the majority (7) occurring in the Professional, Scientific and Technical Services sector. In 2024, 19 FTE are created.
+The Economic Impacts tab shows the economic impact of the project. In 2023, the project will generate 7 Full Time Equivalent (FTE) employees as a direct result of the expenditure. An additional 6 FTE will be generated through the Flow-on effects of the expenditure through the economy. Overall, 13 FTE are created in 2023, with the majority (7) occurring in the Professional, Scientific and Technical Services sector. In 2024, 19 FTE are created. In the app, these results can be found in **Economic Impacts \> Employment Impacts \> Annual Impact Results**.
 
 ## Technical Matters
 
@@ -136,12 +136,26 @@ The EIAT draws on data from the following sources:
 
     -   2021 Census - counting persons, 15 years and over. INDP Industry of Employment, Local Government Areas (2022 Boundaries) (POW) and Local Government Areas (2022 Boundaries) (UR)
 
--   The Australian Bureau of Statistics National Input-Output Table.
+The Australian Bureau of Statistics National Input-Output Table.
 
-    -   Australian National Accounts: Input-Output Tables 2019-20 financial year.
+-   Australian National Accounts: Input-Output Tables 2019-20 financial year.
 
-    -   Table 5. Industry by industry flow table (direct allocation of imports).
+-   Table 5. Industry by industry flow table (direct allocation of imports).
 
-    -   Last updated: 27/05/2022
+-   Last updated: 27/05/2022
 
-    -   Next release: 17/03/2023
+-   Next release: 17/03/2023
+
+### Regional Input Output Tables
+
+The Regional Input-Output Tables used in this tool are derived from the 114 sector Input-Output table provided by the Australian Bureau of Statistics. Due to the availability of data at the regional level, this table is aggregated to a 19 ANZSIC sector Input-Output Table for Australia. This table is the basis for the Regional Input-Output Tables.
+
+Broadly, Input-Output modelling is based on direct coefficients - how sales and purchases by an industry relate to the total production of that industry. These direct coefficients are calculated for the Australian Input-Output Table. Location Quotients are used to determine if an industry in a region can be considered as significant as the industry is across Australia. Significant determines whether or not a region is capable of supplying to local industries at the same proportion as the country as a whole. If not, the region supplies proportionally less to local industries. A region never supplies proportionally more than the country as a whole. Regional employment is used to determine whether or not an industry in a region can be considered significant. The Location Quotient is defined as:
+
+$$
+LQ_{i,r} = \frac{E_{i,r}}{\sum_i E_{i,r}}/\frac{\sum_r E_{i,r}}{\sum_{i,r} E_{i,r}}
+$$
+
+Where $E_{i,r}$ is the FTE employment in region $r$ and industry $i$.
+
+An industry in a region is said to be significant if $LQ_{i,r} \geq 1$.
