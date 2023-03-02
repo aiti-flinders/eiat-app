@@ -116,10 +116,7 @@ params$data %>%
 if (shiny::isRunning()) {setProgress(0.2)}
 ```
 
-```{r industry-input, results = 'asis', fig.cap = "Direct Capital Expenditure Summary by Industry", include = "Summary input data" %in% params$include_graphs}
-
-cat("Figure @ref(fig:industry-input) summarises the direct capital expenditure estimated to occur for each industry and year of the project.\n\n")
-
+```{r industry-input-setup}
 l <- params$data %>%
   as_tibble(rownames = "sector") %>%
   pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
@@ -129,18 +126,24 @@ l <- params$data %>%
 
 
 
+```
+
+```{r industry-input, results = 'asis', fig.cap = "Direct Capital Expenditure Summary by Industry", include = "Summary input data" %in% params$include_graphs, fig.height = 5 + l / 5}
+
+cat("Figure @ref(fig:industry-input) summarises the direct capital expenditure estimated to occur for each industry and year of the project.\n\n")
+
 params$data %>%
   as_tibble(rownames = "sector") %>%
   pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
   filter(expenditure != 0) %>%
   ggplot(aes(x = as.factor(year), y = expenditure, fill = sector)) +
-  geom_col() +
+  geom_col(col = "black") +
   theme_aiti(colour = "grey") +
   labs(x = NULL,
        y = NULL, 
        title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
   scale_y_continuous(labels = scales::dollar_format(suffix = "M")) +
-  scale_fill_discrete(labels = function(x) str_wrap(x, width = 40)) + 
+  scale_fill_discrete(labels = function(x) str_wrap(x, width = 30)) + 
   guides(fill = guide_legend(nrow = ceiling(l/2)))
 if (shiny::isRunning()) {setProgress(0.3)}
 ```
