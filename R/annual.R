@@ -198,7 +198,7 @@ AnnualGraphServer <- function(id, tab, region, impact) {
 
           } else {
             x_axis <- scale_x_discrete()
-            title <- "Test Title"
+            title <- glue("Employment Impacts by Industry (FTE) in {region()}: {paste0(input$year_radio, collapse = ', '}")
           }
 
 
@@ -210,7 +210,7 @@ AnnualGraphServer <- function(id, tab, region, impact) {
             fct_lvls <- c("Flow on GRP", "Direct GRP")
           } else {
             x_axis <- scale_x_discrete()
-            title <- "Test Title"
+            title <- glue("Gross Regional Product Impacts by Industry ($M): {region()} {paste0(input$year_radio, collapse = ','}")
           }
 
 
