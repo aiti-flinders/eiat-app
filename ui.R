@@ -80,7 +80,7 @@ navbarPage("Economic Impact Assessment Tool",
                                  as represented by the Australian Statistical Geography Standard (ASGS) Edition 3."),
                                fluidRow(
                                  column(width = 6,
-                                        selectInput("state", "State:", unique(regions$state_name))
+                                        selectInput("state", "State:", unique(regions$state))
                                  ),
                                  column(width = 6,
                                         selectInput("lga", "Region (LGA): ", unique(regions$lga))

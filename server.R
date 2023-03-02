@@ -205,7 +205,7 @@ function(input, output, session) {
   observe({
     lga <- if (is.null(input$state)) character(0) else {
       regions %>%
-        filter(state_name == input$state) %>%
+        filter(state == input$state) %>%
         pull(lga) %>%
         unique() %>%
         sort()

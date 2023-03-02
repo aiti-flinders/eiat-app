@@ -11,7 +11,7 @@ library(janitor)
 library(shinyvalidate)
 library(shinyjs)
 
-regions <- eiat:::get_available_regions(2021)
+regions <- eiat:::get_available_regions()
 
 description_table <- tags$table(
   tags$tr(
