@@ -47,7 +47,9 @@ library(janitor)
 library(eiat)
 library(flextable)
 library(shiny)
+library(stringr)
 knitr::opts_chunk$set(echo = FALSE,
+                      dev.args = list(png = list(type = "cairo")),
                       fig.width = 6,
                       fig.asp = 0.618,
                       out.width = "70%",
@@ -111,16 +113,23 @@ params$data %>%
 if (shiny::isRunning()) {setProgress(0.2)}
 ```
 
-```{r fig.id = 'industry-input', results = 'asis', fig.cap = "Direct Capital Expenditure Summary by Industry", include = "Summary input data" %in% params$include_graphs, fig.asp = 1}
-
-cat("Figure \\@ref(fig:industry-input) summarises the direct capital expenditure estimated to occur for each industry and year of the project.\n\n")
-
+```{r industry-input-setup}
 l <- params$data %>%
   as_tibble(rownames = "sector") %>%
   pivot_longer(-sector, names_to = "year", values_to = "expenditure") %>%
   filter(expenditure != 0) %>% 
   distinct(sector) %>%
   nrow()
+
+
+
+```
+
+```{r fig.id = 'industry-input', results = 'asis', fig.cap = "Direct Capital Expenditure Summary by Industry", include = "Summary input data" %in% params$include_graphs, fig.asp = 1, fig.height = 5 + l/5}
+
+cat("Figure \\@ref(fig:industry-input) summarises the direct capital expenditure estimated to occur for each industry and year of the project.\n\n")
+
+
 
 params$data %>%
   as_tibble(rownames = "sector") %>%
@@ -133,7 +142,7 @@ params$data %>%
        y = NULL, 
        title = glue("Direct Capital Expenditure ($M) by Industry in {params$region}")) +
   guides(fill = guide_legend(nrow = ceiling((l/19)*7))) + 
-  scale_fill_discrete(labels = function(x) str_wrap(x, width = 40)) + 
+  scale_fill_discrete(labels = function(x) str_wrap(x, width = 30)) + 
   scale_y_continuous(labels = scales::dollar_format(suffix = "M")) + 
   guides(fill = guide_legend(nrow = ceiling(l/2)))
 if (shiny::isRunning()) {setProgress(0.3)}
