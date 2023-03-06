@@ -210,44 +210,11 @@ project.
 As such, the user decides to allocate the direct capital expenditure
 across three industry sectors.
 
-<table style="width:98%;">
-<colgroup>
-<col style="width: 40%" />
-<col style="width: 22%" />
-<col style="width: 13%" />
-<col style="width: 21%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Sector</th>
-<th>2023</th>
-<th>2024</th>
-<th>Total</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Construction</td>
-<td>$0.35 million</td>
-<td>$3.15 million</td>
-<td>$3.5 million</td>
-</tr>
-<tr class="even">
-<td>Rental, Hiring and Real Estate Services</td>
-<td>$0.1 million</td>
-<td>$0.9 million</td>
-<td>$1.0 million</td>
-</tr>
-<tr class="odd">
-<td>Professional, Scientific and Technical Services</td>
-<td><p>$1.5 million (Design)</p>
-<p>$0.5 million (Surveying)</p></td>
-<td></td>
-<td><p>$1.5 million (Design)</p>
-<p>$0 million (Surveying)</p></td>
-</tr>
-</tbody>
-</table>
+| Sector                                          | 2023                                                                                                               | 2024           | Total         |
+|-------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|----------------|---------------|
+| Construction                                    | \$0.35 million                                                                                                     | \$3.15 million | \$3.5 million |
+| Rental, Hiring and Real Estate Services         | \$0.1 million                                                                                                      | \$0.9 million  | \$1.0 million |
+| Professional, Scientific and Technical Services | \$1.5 million (Design) \| \| \$1.5 million (Design) \| \| \$0 million (Surveying) \| \| \$0 million (Surveying) \| |                |               |
 
 ### Results
 

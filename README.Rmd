@@ -108,7 +108,7 @@ As such, the user decides to allocate the direct capital expenditure across thre
 +-------------------------------------------------+---------------------------+----------------+-------------------------+
 | Professional, Scientific and Technical Services | \$1.5 million (Design)    |                | \$1.5 million (Design)  |
 |                                                 |                           |                |                         |
-|                                                 | \$0.5 million (Surveying) |                | \$0 million (Surveying) |
+|                                                 | \$0 million (Surveying) |                | \$0 million (Surveying) |
 +-------------------------------------------------+---------------------------+----------------+-------------------------+
 
 ### Results
